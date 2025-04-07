@@ -54,6 +54,13 @@ copy info.env.example info.env      # Windows
 
 `info.env` 파일을 열어 아래 값을 입력해 주세요.
 
+```env
+TARGET_URL=https://example.com/reservation
+NAME=홍길동
+PHONE_NUMBER=01012345678
+E_MAIL=test@example.com
+```
+
 ---
 
 ## 🧪 실행 전 테스트 (브라우저 작동 확인)
