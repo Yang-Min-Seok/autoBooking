@@ -22,7 +22,7 @@ cd autoBooking
 
 ### 仮想環境の作成と起動
 
-#### macOS / Linux
+#### macOS / Linux / Git Bash
 
 ```bash
 python3 -m venv venv
@@ -68,7 +68,7 @@ E_MAIL=test@example.com
 
 > 自動予約を行う前に、ブラウザが正常に動作するかを確認しましょう。
 
-### macOS / Linux
+### macOS / Linux / Git Bash
 
 ```bash
 chmod +x test_run.sh
@@ -85,7 +85,7 @@ test_run.bat
 
 ## 🚀 自動予約の実行
 
-### macOS / Linux
+### macOS / Linux / Git Bash
 
 ```bash
 chmod +x run.sh

@@ -21,7 +21,7 @@ cd autoBooking
 
 ### 가상환경 생성 및 실행
 
-#### macOS / Linux
+#### macOS / Linux / Git Bash
 
 ```bash
 python3 -m venv venv
@@ -67,7 +67,7 @@ E_MAIL=test@example.com
 
 > 실제 자동 예약을 수행하기 전, 브라우저가 정상 실행되는지 테스트해보세요.
 
-### macOS / Linux
+### macOS / Linux / Git Bash
 
 ```bash
 chmod +x test_run.sh
@@ -84,7 +84,7 @@ test_run.bat
 
 ## 🚀 자동 예약 실행
 
-### macOS / Linux
+### macOS / Linux / Git Bash
 
 ```bash
 chmod +x run.sh
@@ -101,7 +101,7 @@ run.bat
 
 ## 🕑 자동 실행 예약
 
-### macOS (cron 사용)
+### macOS (cron 사용) / Git Bash
 
 ```bash
 crontab -e
