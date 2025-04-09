@@ -56,11 +56,36 @@ def automate_task():
                     found = True
                     break
                 except Exception as e:
-                    print(f"[ERROR] 予約 click fail: {e}")
+                    print(f"[ERROR] STEP 2 fail: {e}")
                     break
 
         if not found:
             print("[WARN] couldn't find badminton court on target day (full of booking)")
+
+        # STEP 3: click badminton 2 (9-11)
+        try:
+            # table.c-table01 > tbody > tr[1] (second table row) > td[1] (second table data)
+            table = driver.find_element(By.CSS_SELECTOR, "table.c-table01")
+            tbody = table.find_element(By.TAG_NAME, "tbody")
+            rows = tbody.find_elements(By.TAG_NAME, "tr")
+
+            if len(rows) < 2:
+                raise Exception("table row under 2 or same")
+
+            second_row = rows[1]
+            tds = second_row.find_elements(By.TAG_NAME, "td")
+
+            if len(tds) < 2:
+                raise Exception("table data under 2 or same")
+
+            # click badminton 2 (9 - 11)
+            reserve_btn = tds[1].find_element(By.TAG_NAME, "a")
+            reserve_btn.click()
+
+            print("[SUCCESS] STEP 3: バドミントン2 9-11 予約 click success")
+
+        except Exception as e:
+            print(f"[ERROR] STEP 3 fail: {e}")
 
     except Exception as e:
         print(f"[ERROR] {e}")
