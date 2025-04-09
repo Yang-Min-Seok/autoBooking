@@ -115,9 +115,9 @@ crontab -e
 
 ### Windows (작업 스케줄러 사용)
 
-1. 작업 스케줄러 열기
-2. 새 작업 생성
-3. 트리거: 매주 토요일 오전 7시
+1. 작업 스케줄러 열기  
+2. 새 작업 생성  
+3. 트리거: 매주 토요일 오전 7시  
 4. 동작: `run.bat` 실행 경로 지정
 
 ---
@@ -126,21 +126,28 @@ crontab -e
 
 ```
 autoBooking/
-├── main.py              # 예약 자동화 메인 스크립트
-├── run.sh               # macOS/Linux 실행용
-├── run.bat              # Windows 실행용
-├── test_main.py         # 브라우저 테스트용
-├── test_run.sh          # 테스트 실행 (.sh)
-├── test_run.bat         # 테스트 실행 (.bat)
-├── info.env.example     # 환경변수 템플릿
-├── requirements.txt     # 의존성 목록
-├── .gitignore           # 민감/불필요 파일 제외
-└── README.md            # 사용 설명서
+├── main.py                  # 예약 자동화 메인 실행 스크립트
+├── run.sh                   # macOS/Linux 실행용
+├── run.bat                  # Windows 실행용
+├── test_run.sh              # 테스트 실행 (.sh)
+├── test_run.bat             # 테스트 실행 (.bat)
+│
+├── step1_access.py          # STEP 1 - 예약 페이지 접속
+├── step2_select_date.py     # STEP 2 - 날짜 선택 및 ○예약 클릭
+├── step3_select_time.py     # STEP 3 - 시간 선택 (예: 9–11시)
+├── step4_input_form.py      # STEP 4 - 이름, 전화번호, 이메일 입력
+├── step5_confirm.py         # STEP 5 - 최종 예약 버튼 클릭
+├── utils.py                 # 공통 함수 모듈 (드라이버 설정 등)
+│
+├── info.env.example         # 환경변수 예시 템플릿
+├── requirements.txt         # 패키지 목록
+├── .gitignore               # Git 제외 설정
+└── README.md                # 한국어 설명서
 ```
 
 ---
 
 ## ✅ 라이선스 및 제작자
 
-- Maintained by [kurooru]
+- Maintained by [kurooru]  
 - License: kurooru

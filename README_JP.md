@@ -116,9 +116,9 @@ crontab -e
 
 ### Windows（タスクスケジューラを使用）
 
-1. タスクスケジューラを起動
-2. 新しいタスクを作成
-3. トリガー：毎週土曜日 午前7時
+1. タスクスケジューラを起動  
+2. 新しいタスクを作成  
+3. トリガー：毎週土曜日 午前7時  
 4. 実行内容：`run.bat` を指定
 
 ---
@@ -127,21 +127,28 @@ crontab -e
 
 ```
 autoBooking/
-├── main.py              # 自動予約のメインスクリプト
-├── run.sh               # macOS/Linux 用の実行ファイル
-├── run.bat              # Windows 用の実行ファイル
-├── test_main.py         # ブラウザ動作テスト用
-├── test_run.sh          # テスト実行（.sh）
-├── test_run.bat         # テスト実行（.bat）
-├── info.env.example     # 環境変数テンプレート
-├── requirements.txt     # パッケージリスト
-├── .gitignore           # 除外対象ファイル
-└── README_JP.md         # この日本語マニュアル
+├── main.py                  # 自動予約のメインスクリプト
+├── run.sh                   # macOS/Linux 用の実行ファイル
+├── run.bat                  # Windows 用の実行ファイル
+├── test_run.sh              # テスト実行（.sh）
+├── test_run.bat             # テスト実行（.bat）
+│
+├── step1_access.py          # STEP 1 - 予約ページにアクセス
+├── step2_select_date.py     # STEP 2 - 日付選択と○予約クリック
+├── step3_select_time.py     # STEP 3 - バドミントン2（9–11時）クリック
+├── step4_input_form.py      # STEP 4 - 名前、電話番号、メールの入力
+├── step5_confirm.py         # STEP 5 - 最終送信ボタンのクリック
+├── utils.py                 # WebDriver設定など共通関数
+│
+├── info.env.example         # 環境変数テンプレート
+├── requirements.txt         # パッケージリスト
+├── .gitignore               # 除外対象ファイル
+└── README_JP.md             # この日本語マニュアル
 ```
 
 ---
 
 ## ✅ ライセンスと作者
 
-- Maintained by [kurooru]
+- Maintained by [kurooru]  
 - License: kurooru
