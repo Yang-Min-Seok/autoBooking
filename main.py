@@ -60,7 +60,7 @@ def automate_task():
                     break
 
         if not found:
-            print("[WARN] couldn't find badminton court on target day")
+            print("[WARN] couldn't find badminton court on target day (full of booking)")
 
     except Exception as e:
         print(f"[ERROR] {e}")
