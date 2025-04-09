@@ -122,6 +122,15 @@ def automate_task():
     except Exception as e:
         print(f"[ERROR] STEP 4 fail: {e}")
     
+    # STEP 5: Click on the final confirmation button
+    try:
+        button_wrapper = driver.find_element(By.CLASS_NAME, "c-form-btn")
+        send_button = button_wrapper.find_element(By.CSS_SELECTOR, 'button[value="send"]')
+        send_button.click()
+        print("[SUCCESS] STEP 5: Click on the final confirmation button success")
+    except Exception as e:
+        print(f"[ERROR] STEP 5 fail: {e}")
+
     finally:
         driver.quit()
 
