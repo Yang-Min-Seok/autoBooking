@@ -86,9 +86,43 @@ def automate_task():
 
         except Exception as e:
             print(f"[ERROR] STEP 3 fail: {e}")
+        
+        # STEP 4: Click on the Name, Phone Number, Email + OK button
+        try:
+            # 1. find form table
+            form_table = driver.find_element(By.CSS_SELECTOR, "table.c-form01")
+
+            # 2. input name
+            name_input = form_table.find_element(By.CSS_SELECTOR, 'input[type="text"]')
+            name_input.clear()
+            name_input.send_keys(os.getenv("NAME"))
+
+            # 3. input phone number
+            phone_input = form_table.find_element(By.CSS_SELECTOR, 'input[type="tel"]')
+            phone_input.clear()
+            phone_input.send_keys(os.getenv("PHONE_NUMBER"))
+
+            # 4. input e-mail
+            email_input = form_table.find_element(By.CSS_SELECTOR, 'input[type="email"]')
+            email_input.clear()
+            email_input.send_keys(os.getenv("E_MAIL"))
+
+            print(f"[SUCCESS] STEP 4: Name, Phone Number, Email input success")
+
+            # 5. click button
+            button_container = driver.find_element(By.CLASS_NAME, "c-form-btn")
+            confirm_button = button_container.find_element(By.NAME, "mode")
+            confirm_button.click()
+
+            print("[SUCCESS] STEP 4: button click success")
+
+        except Exception as e:
+            print(f"[ERROR] STEP 4 fail: {e}")
+
 
     except Exception as e:
         print(f"[ERROR] {e}")
+    
     finally:
         driver.quit()
 
