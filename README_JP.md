@@ -133,7 +133,7 @@ autoBooking/
 ├── test_run.sh              # テスト実行（.sh）
 ├── test_run.bat             # テスト実行（.bat）
 │
-├── step1_access.py          # STEP 1 - 予約ページにアクセス
+├── step1_access_url.py          # STEP 1 - 予約ページにアクセス
 ├── step2_select_date.py     # STEP 2 - 日付選択と○予約クリック
 ├── step3_select_time.py     # STEP 3 - バドミントン2（9–11時）クリック
 ├── step4_input_form.py      # STEP 4 - 名前、電話番号、メールの入力

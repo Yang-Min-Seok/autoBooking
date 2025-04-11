@@ -132,7 +132,7 @@ autoBooking/
 ├── test_run.sh              # 테스트 실행 (.sh)
 ├── test_run.bat             # 테스트 실행 (.bat)
 │
-├── step1_access.py          # STEP 1 - 예약 페이지 접속
+├── step1_access_url.py          # STEP 1 - 예약 페이지 접속
 ├── step2_select_date.py     # STEP 2 - 날짜 선택 및 ○예약 클릭
 ├── step3_select_time.py     # STEP 3 - 시간 선택 (예: 9–11시)
 ├── step4_input_form.py      # STEP 4 - 이름, 전화번호, 이메일 입력
