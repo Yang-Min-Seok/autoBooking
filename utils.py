@@ -1,6 +1,7 @@
 # utils.py
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from webdriver_manager.chrome import ChromeDriverManager
 
 def get_driver():
@@ -12,4 +13,10 @@ def get_driver():
         'intl.accept_languages': 'ja',
         'profile.managed_default_content_settings.images': 2
     })
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+    options.set_capability("pageLoadStrategy", "none")
+
+    return webdriver.Chrome(
+        service=Service(ChromeDriverManager().install()),
+        options=options
+    )
