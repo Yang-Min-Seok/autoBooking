@@ -132,11 +132,12 @@ autoBooking/
 ├── test_run.sh              # 테스트 실행 (.sh)
 ├── test_run.bat             # 테스트 실행 (.bat)
 │
-├── step1_access_url.py          # STEP 1 - 예약 페이지 접속
+├── step1_access_url.py      # STEP 1 - 예약 페이지 접속
 ├── step2_select_date.py     # STEP 2 - 날짜 선택 및 ○예약 클릭
 ├── step3_select_time.py     # STEP 3 - 시간 선택 (예: 9–11시)
 ├── step4_input_form.py      # STEP 4 - 이름, 전화번호, 이메일 입력
 ├── step5_confirm.py         # STEP 5 - 최종 예약 버튼 클릭
+├── step6_wait.py            # STEP 6 - 최종 예약 대기 (5초)
 ├── utils.py                 # 공통 함수 모듈 (드라이버 설정 등)
 │
 ├── info.env.example         # 환경변수 예시 템플릿
@@ -152,6 +153,7 @@ autoBooking/
 | 날짜       | 버전   | 변경 내용                    |
 |------------|--------|------------------------------|
 | 2025-04-09 | 1.0.0  | 첫 배포 (모듈화 완료, 수정 없음) |
+| 2025-04-13 | 1.0.1  | 속도 개선 |
 
 ---
 

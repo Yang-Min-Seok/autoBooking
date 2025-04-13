@@ -133,11 +133,12 @@ autoBooking/
 ├── test_run.sh              # テスト実行（.sh）
 ├── test_run.bat             # テスト実行（.bat）
 │
-├── step1_access_url.py          # STEP 1 - 予約ページにアクセス
+├── step1_access_url.py      # STEP 1 - 予約ページにアクセス
 ├── step2_select_date.py     # STEP 2 - 日付選択と○予約クリック
 ├── step3_select_time.py     # STEP 3 - バドミントン2（9–11時）クリック
 ├── step4_input_form.py      # STEP 4 - 名前、電話番号、メールの入力
 ├── step5_confirm.py         # STEP 5 - 最終送信ボタンのクリック
+├── step6_wait.py            # STEP 6 - 最終予約待ち（５秒）
 ├── utils.py                 # WebDriver設定など共通関数
 │
 ├── info.env.example         # 環境変数テンプレート
@@ -153,6 +154,7 @@ autoBooking/
 | 日付       | バージョン | 変更内容                           |
 |------------|------------|------------------------------------|
 | 2025-04-09 | 1.0.0      | 初回リリース（モジュール化構成、変更なし） |
+| 2025-04-09 | 1.0.0      | アクセス速度改善 |
 
 ---
 
