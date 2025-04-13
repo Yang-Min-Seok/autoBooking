@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 def select_target_date(driver):
-    target_date = datetime.today() + timedelta(days=5)
+    target_date = datetime.today() + timedelta(days=7)
     target_day_str = f"{target_date.day}日"
     print(f"[INFO] target day: {target_day_str}")
 
