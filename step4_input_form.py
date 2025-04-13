@@ -1,8 +1,13 @@
 # step4_input_form.py
 import os
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 def fill_reservation_form(driver):
+    WebDriverWait(driver, 5).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "table.c-form01"))
+    )
     form_table = driver.find_element(By.CSS_SELECTOR, "table.c-form01")
 
     name_input = form_table.find_element(By.CSS_SELECTOR, 'input[type="text"]')
