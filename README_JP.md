@@ -138,6 +138,7 @@ autoBooking/
 ├── step3_select_time.py     # STEP 3 - バドミントン2（9–11時）クリック
 ├── step4_input_form.py      # STEP 4 - 名前、電話番号、メールの入力
 ├── step5_confirm.py         # STEP 5 - 最終送信ボタンのクリック
+├── step6_wait.py            # STEP 6 - 最終予約待ち（５秒）
 ├── utils.py                 # WebDriver設定など共通関数
 │
 ├── info.env.example         # 環境変数テンプレート

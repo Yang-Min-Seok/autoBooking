@@ -137,6 +137,7 @@ autoBooking/
 ├── step3_select_time.py     # STEP 3 - 시간 선택 (예: 9–11시)
 ├── step4_input_form.py      # STEP 4 - 이름, 전화번호, 이메일 입력
 ├── step5_confirm.py         # STEP 5 - 최종 예약 버튼 클릭
+├── step6_wait.py            # STEP 6 - 최종 예약 대기 (5초)
 ├── utils.py                 # 공통 함수 모듈 (드라이버 설정 등)
 │
 ├── info.env.example         # 환경변수 예시 템플릿
