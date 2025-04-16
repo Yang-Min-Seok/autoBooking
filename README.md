@@ -101,6 +101,10 @@ crontab -e
 
 아래 라인 추가 (매주 토요일 오전 7시 실행):
 
+```cron
+0 7 * * 6 /Users/yourname/autoBooking/start_booking.sh >> /Users/yourname/autoBooking/cron.log 2>&1
+```
+
 ### Windows (작업 스케줄러 사용)
 
 1. **작업 스케줄러** 실행  
@@ -108,10 +112,6 @@ crontab -e
 3. **트리거**: 매주 토요일 오전 7시 설정  
 4. **동작**: `run_playwright.bat` 경로 지정 (예: `C:\\Users\\사용자이름\\autoBooking\\run_playwright.bat`)  
 5. 완료 후, 스크립트가 매주 자동으로 실행됩니다 
-
-```cron
-0 7 * * 6 /Users/yourname/autoBooking/start_booking.sh >> /Users/yourname/autoBooking/cron.log 2>&1
-```
 
 ---
 

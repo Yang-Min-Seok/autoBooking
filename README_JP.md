@@ -100,6 +100,10 @@ start_playwright.bat
 crontab -e
 ```
 
+```cron
+0 7 * * 6 /Users/yourname/autoBooking/run_playwright.sh >> /Users/yourname/autoBooking/cron.log 2>&1
+```
+
 ### Windows（タスクスケジューラを使用）
 
 1. **タスクスケジューラ** を開く  
@@ -110,9 +114,11 @@ crontab -e
 
 以下の行を追加（毎週土曜 午前7時実行）：
 
-```cron
-0 7 * * 6 /Users/yourname/autoBooking/run_playwright.sh >> /Users/yourname/autoBooking/cron.log 2>&1
-```
+1. **タスクスケジューラ** を開く  
+2. **基本タスクの作成** をクリック  
+3. **トリガー**：毎週土曜日 午前7時 に設定  
+4. **操作**：`run_playwright.bat` のパスを指定（例：`C:\\Users\\ユーザー名\\autoBooking\\run_playwright.bat`）  
+5. 完了後、スクリプトが毎週自動的に実行されます  
 
 ---
 
