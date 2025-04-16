@@ -1,8 +1,8 @@
 # 📅 自動予約マクロシステム (autoBooking) JAPANESE(🇯🇵)
 
 ウェブサイト上での予約を自動で実行する、Pythonベースの自動化スクリプトです。  
-Seleniumを使ってブラウザを操作し、`.env`ファイルで個人情報を安全に管理します。  
-cronやタスクスケジューラを使って定期的な実行も可能です。
+Playwrightを使用してブラウザを操作し、`.env`ファイルで個人情報を管理します。  
+cronやタスクスケジューラでの定期実行にも対応しています。
 
 ---
 
@@ -10,8 +10,8 @@ cronやタスクスケジューラを使って定期的な実行も可能です�
 
 ### ✅ クローン先のパスにご注意
 
-> ❌ フォルダ名に日本語が含まれているパスや、`OneDrive`、`iCloud`、`ドキュメント`などのクラウドフォルダでは実行に失敗する可能性があります  
-> ✅ `C:\Projects` や `~/Projects` のようなローカルの英字パスを推奨
+> ❌ 日本語やクラウドフォルダ（例：`OneDrive`, `iCloud`, `ドキュメント`）では失敗する可能性があります  
+> ✅ 英語名のローカルパスを推奨（例：`C:\Projects`, `~/Projects`）
 
 ```bash
 git clone https://github.com/Yang-Min-Seok/autoBooking
@@ -42,6 +42,7 @@ venv\Scripts\activate
 
 ```bash
 pip install -r requirements.txt
+playwright install
 ```
 
 ---
@@ -53,7 +54,7 @@ cp info.env.example info.env        # macOS / Linux
 copy info.env.example info.env      # Windows
 ```
 
-`info.env`ファイルを開いて、以下の内容を入力してください：
+`info.env`ファイルを開いて、以下の情報を入力してください：
 
 ```env
 TARGET_URL=https://example.com/reservation
@@ -64,21 +65,12 @@ E_MAIL=test@example.com
 
 ---
 
-## 🧪 実行前のテスト（ブラウザ確認）
+## 🧪 実行前のテスト
 
-> 自動予約を行う前に、ブラウザが正常に動作するかを確認しましょう。
-
-### macOS / Linux / Git Bash
+> Playwrightが正常に動作するか確認します。
 
 ```bash
-chmod +x test_run.sh
-./test_run.sh
-```
-
-### Windows
-
-```cmd
-test_run.bat
+python3 auto_booking.py
 ```
 
 ---
@@ -88,14 +80,14 @@ test_run.bat
 ### macOS / Linux / Git Bash
 
 ```bash
-chmod +x run.sh
-./run.sh
+chmod +x start_booking.sh
+./start_playwright.sh
 ```
 
 ### Windows
 
 ```cmd
-run.bat
+start_playwright.bat
 ```
 
 ---
@@ -108,18 +100,19 @@ run.bat
 crontab -e
 ```
 
-以下の行を追加してください（毎週土曜日の午前7時に実行）：
+以下の行を追加（毎週土曜 午前7時実行）：
 
 ```cron
-0 7 * * 6 /Users/yourname/autoBooking/run.sh >> /Users/yourname/autoBooking/cron.log 2>&1
+0 7 * * 6 /Users/yourname/autoBooking/run_playwright.sh >> /Users/yourname/autoBooking/cron.log 2>&1
 ```
 
 ### Windows（タスクスケジューラを使用）
 
-1. タスクスケジューラを起動  
-2. 新しいタスクを作成  
-3. トリガー：毎週土曜日 午前7時  
-4. 実行内容：`run.bat` を指定
+1. **タスクスケジューラ** を開く  
+2. **基本タスクの作成** をクリック  
+3. **トリガー**：毎週土曜日 午前7時 に設定  
+4. **操作**：`run_playwright.bat` のパスを指定（例：`C:\\Users\\ユーザー名\\autoBooking\\run_playwright.bat`）  
+5. 完了後、スクリプトが毎週自動的に実行されます  
 
 ---
 
@@ -127,38 +120,36 @@ crontab -e
 
 ```
 autoBooking/
-├── main.py                  # 自動予約のメインスクリプト
-├── run.sh                   # macOS/Linux 用の実行ファイル
-├── run.bat                  # Windows 用の実行ファイル
-├── test_run.sh              # テスト実行（.sh）
-├── test_run.bat             # テスト実行（.bat）
+├── auto_booking_playwright.py     # 自動予約のメインスクリプト
+├── run_playwright.sh              # macOS/Linux用スクリプト
+├── run_playwright.bat             # Windows用スクリプト
 │
-├── step1_access_url.py      # STEP 1 - 予約ページにアクセス
-├── step2_select_date.py     # STEP 2 - 日付選択と○予約クリック
-├── step3_select_time.py     # STEP 3 - バドミントン2（9–11時）クリック
-├── step4_input_form.py      # STEP 4 - 名前、電話番号、メールの入力
-├── step5_confirm.py         # STEP 5 - 最終送信ボタンのクリック
-├── step6_wait.py            # STEP 6 - 最終予約待ち（５秒）
-├── utils.py                 # WebDriver設定など共通関数
+├── steps/                         # 各STEPをモジュール化
+│   ├── access_page.py             # STEP 1 - ページアクセス
+│   ├── select_date.py             # STEP 2 - 日付選択と○予約クリック
+│   ├── select_time.py             # STEP 3 - 時間スロット選択（9–11時）
+│   ├── fill_form.py               # STEP 4 - 名前・電話番号・メール入力
+│   └── confirm_final.py           # STEP 5 - 最終確認ボタンクリック
 │
-├── info.env.example         # 環境変数テンプレート
-├── requirements.txt         # パッケージリスト
-├── .gitignore               # 除外対象ファイル
-└── README_JP.md             # この日本語マニュアル
+├── info.env.example               # 環境変数テンプレート
+├── requirements.txt               # パッケージリスト
+├── .gitignore                     # 除外設定
+└── README_JP.md                   # 日本語のマニュアル
 ```
 
 ---
 
 ## 📌 バージョン履歴
 
-| 日付       | バージョン | 変更内容                           |
-|------------|------------|------------------------------------|
-| 2025-04-09 | 1.0.0      | 初回リリース（モジュール化構成、変更なし） |
-| 2025-04-09 | 1.0.0      | アクセス速度改善 |
+| 日付        | バージョン | 変更内容                                  |
+|-------------|------------|-------------------------------------------|
+| 2025-04-09  | 1.0.0      | 初回リリース（Seleniumベース）              |
+| 2025-04-13  | 1.0.1      | Seleniumに基づいた速度改善               |
+| 2025-04-14  | 2.0.0      | Playwright導入及び、速度改善 |
 
 ---
 
 ## ✅ ライセンスと作者
 
 - Maintained by [kurooru]  
-- License: kurooru
+- License: MIT または希望するライセンスに変更可能
