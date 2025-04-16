@@ -1,7 +1,7 @@
 # 📅 자동 예약 매크로 시스템 (autoBooking) KOREAN(🇰🇷)
 
 웹사이트 예약을 자동으로 수행하는 Python 기반 자동화 스크립트입니다.  
-Selenium을 활용해 브라우저를 조작하고, `.env`로 개인정보를 관리하며, cron 또는 작업 스케줄러로 정기 실행이 가능합니다.
+Playwright를 활용해 브라우저를 조작하고, `.env`로 개인정보를 관리하며, cron 또는 작업 스케줄러로 정기 실행이 가능합니다.
 
 ---
 
@@ -41,6 +41,7 @@ venv\Scripts\activate
 
 ```bash
 pip install -r requirements.txt
+playwright install
 ```
 
 ---
@@ -52,7 +53,7 @@ cp info.env.example info.env        # macOS / Linux
 copy info.env.example info.env      # Windows
 ```
 
-`info.env` 파일을 열어 아래 값을 입력해 주세요.
+`info.env` 파일을 열어 아래 값을 입력해 주세요:
 
 ```env
 TARGET_URL=https://example.com/reservation
@@ -63,21 +64,12 @@ E_MAIL=test@example.com
 
 ---
 
-## 🧪 실행 전 테스트 (브라우저 작동 확인)
+## 🧪 실행 전 테스트
 
-> 실제 자동 예약을 수행하기 전, 브라우저가 정상 실행되는지 테스트해보세요.
-
-### macOS / Linux / Git Bash
+> Playwright 브라우저가 정상 작동하는지 먼저 확인하세요.
 
 ```bash
-chmod +x test_run.sh
-./test_run.sh
-```
-
-### Windows
-
-```cmd
-test_run.bat
+python3 auto_booking.py
 ```
 
 ---
@@ -87,21 +79,21 @@ test_run.bat
 ### macOS / Linux / Git Bash
 
 ```bash
-chmod +x run.sh
-./run.sh
+chmod +x start_booking.sh
+./start_booking.sh
 ```
 
 ### Windows
 
 ```cmd
-run.bat
+start_booking.bat
 ```
 
 ---
 
 ## 🕑 자동 실행 예약
 
-### macOS (cron 사용) / Git Bash
+### macOS (cron 사용)
 
 ```bash
 crontab -e
@@ -109,16 +101,17 @@ crontab -e
 
 아래 라인 추가 (매주 토요일 오전 7시 실행):
 
-```cron
-0 7 * * 6 /Users/yourname/autoBooking/run.sh >> /Users/yourname/autoBooking/cron.log 2>&1
-```
-
 ### Windows (작업 스케줄러 사용)
 
-1. 작업 스케줄러 열기  
-2. 새 작업 생성  
-3. 트리거: 매주 토요일 오전 7시  
-4. 동작: `run.bat` 실행 경로 지정
+1. **작업 스케줄러** 실행  
+2. **기본 작업 만들기** 클릭  
+3. **트리거**: 매주 토요일 오전 7시 설정  
+4. **동작**: `run_playwright.bat` 경로 지정 (예: `C:\\Users\\사용자이름\\autoBooking\\run_playwright.bat`)  
+5. 완료 후, 스크립트가 매주 자동으로 실행됩니다 
+
+```cron
+0 7 * * 6 /Users/yourname/autoBooking/start_booking.sh >> /Users/yourname/autoBooking/cron.log 2>&1
+```
 
 ---
 
@@ -126,38 +119,36 @@ crontab -e
 
 ```
 autoBooking/
-├── main.py                  # 예약 자동화 메인 실행 스크립트
-├── run.sh                   # macOS/Linux 실행용
-├── run.bat                  # Windows 실행용
-├── test_run.sh              # 테스트 실행 (.sh)
-├── test_run.bat             # 테스트 실행 (.bat)
+├── auto_booking.py                # 예약 전체 실행 메인 파일
+├── start_booking.sh               # macOS/Linux 실행용 스크립트
+├── start_booking.bat              # Windows 실행용 스크립트
 │
-├── step1_access_url.py      # STEP 1 - 예약 페이지 접속
-├── step2_select_date.py     # STEP 2 - 날짜 선택 및 ○예약 클릭
-├── step3_select_time.py     # STEP 3 - 시간 선택 (예: 9–11시)
-├── step4_input_form.py      # STEP 4 - 이름, 전화번호, 이메일 입력
-├── step5_confirm.py         # STEP 5 - 최종 예약 버튼 클릭
-├── step6_wait.py            # STEP 6 - 최종 예약 대기 (5초)
-├── utils.py                 # 공통 함수 모듈 (드라이버 설정 등)
+├── steps/                         # STEP별 모듈화된 기능
+│   ├── access_page.py             # STEP 1 - 예약 페이지 접속
+│   ├── select_date.py             # STEP 2 - 날짜 탐색 및 ○예약 클릭
+│   ├── select_time.py             # STEP 3 - 시간 선택 (예: 9–11시)
+│   ├── fill_form.py               # STEP 4 - 이름, 전화번호, 이메일 입력
+│   └── confirm_final.py           # STEP 5 - 최종 예약 버튼 클릭
 │
-├── info.env.example         # 환경변수 예시 템플릿
-├── requirements.txt         # 패키지 목록
-├── .gitignore               # Git 제외 설정
-└── README.md                # 한국어 설명서
+├── info.env.example               # 환경변수 템플릿
+├── requirements.txt               # 의존 패키지 목록
+├── .gitignore                     # Git 제외 설정
+└── README.md                      # 설명서 (Korean)
 ```
 
 ---
 
 ## 📌 버전 기록
 
-| 날짜       | 버전   | 변경 내용                    |
-|------------|--------|------------------------------|
-| 2025-04-09 | 1.0.0  | 첫 배포 (모듈화 완료, 수정 없음) |
-| 2025-04-13 | 1.0.1  | 속도 개선 |
+| 날짜       | 버전   | 변경 내용                               |
+|------------|--------|------------------------------------------|
+| 2025-04-09 | 1.0.0  | 첫 배포 (Selenium 기반)                  |
+| 2025-04-13 | 1.0.1  | Selenium 기반 속도 개선 |
+| 2025-04-14 | 2.0.0  | Playwright 버전 도입 및 속도 개선 |
 
 ---
 
 ## ✅ 라이선스 및 제작자
 
 - Maintained by [kurooru]  
-- License: kurooru
+- License: MIT or 커스텀 라이선스 (원하는 라이선스로 변경 가능)
