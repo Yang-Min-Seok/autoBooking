@@ -100,6 +100,8 @@ start_playwright.bat
 crontab -e
 ```
 
+以下の行を追加（毎週土曜 午前7時実行）：
+
 ```cron
 0 7 * * 6 /Users/yourname/autoBooking/run_playwright.sh >> /Users/yourname/autoBooking/cron.log 2>&1
 ```
