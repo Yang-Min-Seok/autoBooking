@@ -151,4 +151,4 @@ autoBooking/
 ## ✅ ライセンスと作者
 
 - Maintained by [kurooru]  
-- License: MIT または希望するライセンスに変更可能
+- License: kurooru

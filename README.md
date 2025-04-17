@@ -150,4 +150,4 @@ autoBooking/
 ## ✅ 라이선스 및 제작자
 
 - Maintained by [kurooru]  
-- License: MIT or 커스텀 라이선스 (원하는 라이선스로 변경 가능)
+- License: kurooru
