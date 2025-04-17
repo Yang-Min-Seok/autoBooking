@@ -56,7 +56,6 @@ copy info.env.example info.env      # Windows
 `info.env` 파일을 열어 아래 값을 입력해 주세요:
 
 ```env
-TARGET_URL=https://example.com/reservation
 NAME=홍길동
 PHONE_NUMBER=01012345678
 E_MAIL=test@example.com
@@ -110,7 +109,7 @@ crontab -e
 1. **작업 스케줄러** 실행  
 2. **기본 작업 만들기** 클릭  
 3. **트리거**: 매주 토요일 오전 7시 설정  
-4. **동작**: `run_playwright.bat` 경로 지정 (예: `C:\\Users\\사용자이름\\autoBooking\\run_playwright.bat`)  
+4. **동작**: `start_booking.bat` 경로 지정 (예: `C:\\Users\\사용자이름\\autoBooking\\start_booking.bat`)  
 5. 완료 후, 스크립트가 매주 자동으로 실행됩니다 
 
 ---
