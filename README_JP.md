@@ -60,6 +60,24 @@ copy info.env.example info.env      # Windows
 NAME=山田太郎
 PHONE_NUMBER=09012345678
 E_MAIL=test@example.com
+COURT_NO= ※下記オプションより選択※
+1   :   1番 コート
+2   :   2番コート
+3   :   3番コート
+
+例）3番コート選択の場合
+COURT_NO=3
+
+TIME= ※下記オプションより選択※
+9-11    :   09時 ~ 11時
+11-13   :   11時 ~ 13時
+13-15   :   13時 ~ 15時
+15-17   :   15時 ~ 17時
+17-19   :   17時 ~ 19時
+19-21   :   19時 ~ 21時
+
+例）9時~11時選択時
+TIME=9-11
 ```
 
 ---
@@ -86,7 +104,7 @@ chmod +x start_booking.sh
 ### Windows
 
 ```cmd
-start_playwright.bat
+start_booking.bat
 ```
 
 ---
@@ -145,6 +163,7 @@ autoBooking/
 | 2025-04-09  | 1.0.0      | 初回リリース（Seleniumベース）              |
 | 2025-04-13  | 1.0.1      | Seleniumに基づいた速度改善               |
 | 2025-04-14  | 2.0.0      | Playwright導入及び、速度改善 |
+| 2025-04-17  | 2.0.1      | コート洗濯機能追加 |
 
 ---
 
