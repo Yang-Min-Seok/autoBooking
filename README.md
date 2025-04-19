@@ -143,7 +143,7 @@ autoBooking/
 ├── steps/                         # STEP별 모듈화된 기능
 │   ├── access_page.py             # STEP 1 - 예약 페이지 접속
 │   ├── select_date.py             # STEP 2 - 날짜 탐색 및 ○예약 클릭
-│   ├── select_time.py             # STEP 3 - 시간 선택 (예: 9–11시)
+│   ├── select_time.py             # STEP 3 - 시간 선택
 │   ├── fill_form.py               # STEP 4 - 이름, 전화번호, 이메일 입력
 │   └── confirm_final.py           # STEP 5 - 최종 예약 버튼 클릭
 │
