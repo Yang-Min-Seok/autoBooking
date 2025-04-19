@@ -1,3 +1,4 @@
+# Fill up form
 async def fill_reservation_form(page, name, phone, email):
     print("[INFO] Filling out form...")
     await page.wait_for_selector("table.c-form01")
