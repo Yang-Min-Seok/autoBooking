@@ -98,7 +98,7 @@ python3 auto_booking.py
 
 ```bash
 chmod +x start_booking.sh
-./start_playwright.sh
+./start_booking.sh
 ```
 
 ### Windows
@@ -137,14 +137,14 @@ crontab -e
 
 ```
 autoBooking/
-├── auto_booking_playwright.py     # 自動予約のメインスクリプト
-├── run_playwright.sh              # macOS/Linux用スクリプト
-├── run_playwright.bat             # Windows用スクリプト
+├── auto_booking.py     # 自動予約のメインスクリプト
+├── start_booking.sh              # macOS/Linux用スクリプト
+├── start_booking.bat             # Windows用スクリプト
 │
 ├── steps/                         # 各STEPをモジュール化
 │   ├── access_page.py             # STEP 1 - ページアクセス
 │   ├── select_date.py             # STEP 2 - 日付選択と○予約クリック
-│   ├── select_time.py             # STEP 3 - 時間スロット選択（9–11時）
+│   ├── select_time.py             # STEP 3 - 時間スロット選択
 │   ├── fill_form.py               # STEP 4 - 名前・電話番号・メール入力
 │   └── confirm_final.py           # STEP 5 - 最終確認ボタンクリック
 │
