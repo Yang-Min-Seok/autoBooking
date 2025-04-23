@@ -13,18 +13,24 @@ from steps.confirm_final import confirm_reservation
 
 # Load environment variables
 load_dotenv("info.env")
-TARGET_URL = os.getenv("TARGET_URL")
 NAME = os.getenv("NAME")
 PHONE_NUMBER = os.getenv("PHONE_NUMBER")
 E_MAIL = os.getenv("E_MAIL")
 COURT_NO = os.getenv("COURT_NO")
 TIME = os.getenv("TIME")
+GYM = os.getenv("GYM")
 
 # Set variables
-day_after = 7
-waiting_sec = 3000
+day_after               = 7
+waiting_sec             = 3000
+higashi_max_court_no    = 3
 
 async def main():
+    # Invalid variables check
+    if GYM != "KAMEDA" and int(COURT_NO) > higashi_max_court_no:
+        print(f"[ERROR] Higashi doesn't have courts more than {higashi_max_court_no}.")
+        return
+    
     start_time = time.perf_counter()
 
     async with async_playwright() as p:
@@ -35,7 +41,7 @@ async def main():
         page = await context.new_page()
 
         # STEP1 : Access to target URL
-        await access_target_page(page, TARGET_URL)
+        await access_target_page(page, GYM)
 
         # Calc target date
         target_date = datetime.today() + timedelta(days=day_after)
