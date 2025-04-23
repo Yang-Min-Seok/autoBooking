@@ -16,6 +16,7 @@ async def select_target_date(page, target_day_str):
             reserve_button = row.locator("td").nth(badmintod_reserve_btn_pos).locator("a:has-text('予約')")
             if await reserve_button.count() > 0:
                 await reserve_button.click()
+                print("[INFO] Target reserve button clicked")
                 return True
             else:
                 print("[WARN] No '予約' button found in this row.(Date was found but booking unavaliable)")
