@@ -7,6 +7,9 @@ async def access_target_page(page, gym):
     elif gym == "KAMEDA":
         gym_no = 429
 
+    elif gym == "TOYANO":
+        gym_no = 420
+
     else:
         print("[ERROR] Invalid GYM.")
 
