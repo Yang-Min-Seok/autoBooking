@@ -24,13 +24,21 @@ GYM = os.getenv("GYM")
 day_after               = 7
 waiting_sec             = 3000
 higashi_max_court_no    = 3
+toyano_max_court_no     = 6
+kameda_max_court_no     = 11
 
 async def main():
     # Invalid variables check
-    if GYM != "KAMEDA" and int(COURT_NO) > higashi_max_court_no:
+    if GYM == "HIGASHI" and int(COURT_NO) > higashi_max_court_no:
         print(f"[ERROR] Higashi doesn't have courts more than {higashi_max_court_no}.")
         return
-    
+    elif GYM == "TOYANO" and int(COURT_NO) > toyano_max_court_no:
+        print(f"[ERROR] Toyano doesn't have courts more than {toyano_max_court_no}.")
+        return
+    elif GYM == "KAMEDA" and int(COURT_NO) > kameda_max_court_no:
+        print(f"[ERROR] KAMEDA doesn't have courts more than {kameda_max_court_no}.")
+        return
+
     start_time = time.perf_counter()
 
     async with async_playwright() as p:
