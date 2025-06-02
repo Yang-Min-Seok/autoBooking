@@ -1,19 +1,6 @@
 # Select time
 
 # Set Variables
-court_dict = {
-    "1"     : 0,
-    "2"     : 1,
-    "3"     : 2,
-    "4"     : 3,
-    "5"     : 4,
-    "6"     : 5,
-    "7"     : 6,
-    "8"     : 7,
-    "9"     : 8,
-    "10"    : 9,
-    "11"    : 10,
-}
 
 time_dict = {
     "9-11" : 1,
@@ -27,6 +14,22 @@ time_dict = {
 async def select_time_slot(page, court_no, time):
     print("[INFO] Selecting target badminton court...")
     await page.wait_for_selector("table.c-table01")
-    target_row = page.locator("table.c-table01 tbody tr").nth(court_dict[court_no])
+
+    rows = page.locator("table.c-table01 tbody tr")
+    row_count = await rows.count()
+
+    target_row_index = -1
+    for i in range(row_count):
+        first_cell = rows.nth(i).locator("td").first
+        row_text = await first_cell.inner_text()
+        if court_no in row_text:
+            target_row_index = i
+            break
+
+    if target_row_index == -1:
+        raise Exception(f"[ERROR] Court '{court_no}' not found in table rows.")
+
+    target_row = rows.nth(target_row_index)
     target_time = target_row.locator("td").nth(time_dict[time])
+
     await target_time.locator("a").click(timeout=5000)
