@@ -56,6 +56,8 @@ copy info.env.example info.env      # Windows
 `info.env` 파일을 열어 아래 값을 입력해 주세요:
 
 ```env
+PROJECT_DIR=/Users/yourname/path/to/autoBooking (autoBooking을 clone한 경로)
+
 GYM= ※ 아래 옵션 중 선택 ※
 HIGASHI :   히가시 종합 체육관
 KAMEDA  :   카메다 종합 체육관
@@ -134,6 +136,11 @@ start_booking.bat
 ---
 
 ## 🕑 자동 실행 예약
+
+> ⚠️ **예약 전날 MacBook을 닫아두면 예약이 실패할 수 있습니다.**  
+> 자동 실행을 위해서는 Mac이 잠자기 상태가 아니어야 하며, 화면이 꺼져 있어도 뚜껑이 닫힌 경우 cron 작업이 수행되지 않습니다.  
+> 반드시 예약 전날에는 **MacBook을 열어두거나 외부 모니터에 연결**해 주세요.
+
 
 ### macOS (cron 사용)
 

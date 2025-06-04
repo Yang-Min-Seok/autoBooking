@@ -57,6 +57,8 @@ copy info.env.example info.env      # Windows
 `info.env`ファイルを開いて、以下の情報を入力してください：
 
 ```env
+PROJECT_DIR=/Users/yourname/path/to/autoBooking（autoBookingをクローンしたパス）
+
 GYM= ※下記オプションより選択※
 HIGASHI :   東総合体育館
 KAMEDA  :   亀田総合体育館
@@ -135,6 +137,11 @@ start_booking.bat
 ---
 
 ## 🕑 定期実行の設定
+
+> ⚠️ **前日にMacBookの蓋を閉じた状態では、予約が失敗する可能性があります。**  
+> cronによる自動実行には、Macがスリープ状態でないことが必要です。画面がオフでも蓋が閉じていると動作しません。  
+> 前日には**必ずMacBookの蓋を開けた状態にするか、外部モニターに接続**してください。
+
 
 ### macOS（cronを使用）
 
