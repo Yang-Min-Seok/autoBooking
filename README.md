@@ -49,14 +49,16 @@ playwright install
 ### 환경변수 설정
 
 ```bash
-cp info.env.example info.env        # macOS / Linux
-copy info.env.example info.env      # Windows
+cp info.env.example info1.env info2.env info3.env      # macOS / Linux
+copy info.env.example info1.env info2.env info3.env    # Windows
 ```
 
-`info.env` 파일을 열어 아래 값을 입력해 주세요:
+`info1.env ~ info3.env` 파일을 각각 열어 아래 값을 입력해 주세요:
 
 ```env
-PROJECT_DIR=/Users/yourname/path/to/autoBooking (autoBooking을 clone한 경로)
+USE= ※ 아래 옵션 중 선택 ※
+ON  :   예약 진행하기
+OFF :   예약 진행하지않기
 
 GYM= ※ 아래 옵션 중 선택 ※
 HIGASHI :   히가시 종합 체육관
@@ -104,6 +106,8 @@ TIME= ※ 아래 옵션 중 선택 ※
 
 ex. 9시 ~ 11시 선택 시
 TIME=9-11
+
+ROJECT_DIR=/Users/yourname/path/to/autoBooking (autoBooking의 절대경로 위치)
 ```
 
 ---
@@ -198,6 +202,7 @@ autoBooking/
 | 2025-04-23 | 2.1.1  | 체육관 지정 기능 추가(카메다), 예약 실패 반응 속도 단축 |
 | 2025-05-10 | 2.2.0  | 체육관 옵션 추가(토야노) |
 | 2025-06-02 | 2.2.1  | 에러 대응, 안정성 형상 |
+| 2025-06-28 | 3.0.0  | 다중 코트 대응(3코트까지), 속도 개선 |
 
 ---
 
