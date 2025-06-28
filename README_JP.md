@@ -50,14 +50,16 @@ playwright install
 ### 環境変数ファイルの設定
 
 ```bash
-cp info.env.example info.env        # macOS / Linux
-copy info.env.example info.env      # Windows
+cp info.env.example info1.env info2.env info3.env      # macOS / Linux
+copy info.env.example info1.env info2.env info3.env    # Windows
 ```
 
-`info.env`ファイルを開いて、以下の情報を入力してください：
+`info1.env ~ info3.env`ファイルを開いて、以下の情報を入力してください：
 
 ```env
-PROJECT_DIR=/Users/yourname/path/to/autoBooking（autoBookingをクローンしたパス）
+USE= ※下記オプションより選択※
+ON  :   予約する
+OFF :   予約しない
 
 GYM= ※下記オプションより選択※
 HIGASHI :   東総合体育館
@@ -105,6 +107,8 @@ TIME= ※下記オプションより選択※
 
 例）9時~11時選択の場合
 TIME=9-11
+
+PROJECT_DIR=/Users/yourname/path/to/autoBooking（autoBookingの絶対パス）
 ```
 
 ---

@@ -1,7 +1,8 @@
-# auto_booking_playwright.py
+# auto_booking.py
 import asyncio
 import os
 import time
+import argparse
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from playwright.async_api import async_playwright
@@ -11,71 +12,78 @@ from steps.select_time import select_time_slot
 from steps.fill_form import fill_reservation_form
 from steps.confirm_final import confirm_reservation
 
-# Load environment variables
-load_dotenv("info.env")
+# Argument Parsing
+parser = argparse.ArgumentParser(description="Automated Gym Court Reservation")
+parser.add_argument("--env", required=True, help="Path to the .env file")
+parser.add_argument("--court", required=True, help="Court number to reserve")
+parser.add_argument("--time", required=True, help="Time slot to reserve")
+args = parser.parse_args()
+
+# Load environment variables from specified file
+if not os.path.exists(args.env):
+    print(f"[ERROR] .env file not found: {args.env}")
+    exit(1)
+
+load_dotenv(args.env)
+
+# Extract variables
 NAME = os.getenv("NAME")
 PHONE_NUMBER = os.getenv("PHONE_NUMBER")
 E_MAIL = os.getenv("E_MAIL")
-COURT_NO = os.getenv("COURT_NO")
-TIME = os.getenv("TIME")
 GYM = os.getenv("GYM")
 
-# Set variables
-day_after               = 7
+# Set constants
+day_after               = 6
 waiting_sec             = 3000
 higashi_max_court_no    = 3
 toyano_max_court_no     = 6
 kameda_max_court_no     = 11
 
 async def main():
-    # Invalid variables check
-    if GYM == "HIGASHI" and int(COURT_NO) > higashi_max_court_no:
-        print(f"[ERROR] Higashi doesn't have courts more than {higashi_max_court_no}.")
+    # Validate court number based on gym
+    if GYM == "HIGASHI" and int(args.court) > higashi_max_court_no:
+        print(f"[ERROR] Higashi Gym has maximum {higashi_max_court_no} courts.")
         return
-    elif GYM == "TOYANO" and int(COURT_NO) > toyano_max_court_no:
-        print(f"[ERROR] Toyano doesn't have courts more than {toyano_max_court_no}.")
+    elif GYM == "TOYANO" and int(args.court) > toyano_max_court_no:
+        print(f"[ERROR] Toyano Gym has maximum {toyano_max_court_no} courts.")
         return
-    elif GYM == "KAMEDA" and int(COURT_NO) > kameda_max_court_no:
-        print(f"[ERROR] KAMEDA doesn't have courts more than {kameda_max_court_no}.")
+    elif GYM == "KAMEDA" and int(args.court) > kameda_max_court_no:
+        print(f"[ERROR] Kameda Gym has maximum {kameda_max_court_no} courts.")
         return
 
     start_time = time.perf_counter()
 
     async with async_playwright() as p:
-
-        # Set playwright options
         browser = await p.chromium.launch(headless=True)
         context = await browser.new_context(locale="ja-JP")
         page = await context.new_page()
 
-        # STEP1 : Access to target URL
+        # Step 1: Access target page
         await access_target_page(page, GYM)
 
-        # Calc target date
+        # Calculate target date
         target_date = datetime.today() + timedelta(days=day_after)
         target_day_str = f"{target_date.day}日"
 
-        # STEP2 : Select date
+        # Step 2: Select date
         selected = await select_target_date(page, target_day_str)
         if not selected:
             await browser.close()
             return
 
-        # STEP3 : Select time
-        await select_time_slot(page, COURT_NO, TIME)
+        # Step 3: Select time slot
+        await select_time_slot(page, args.court, args.time)
 
-        # STEP4 : Fill up form
+        # Step 4: Fill in reservation form
         await fill_reservation_form(page, NAME, PHONE_NUMBER, E_MAIL)
 
-        # STEP5 : Confirm reservation
+        # Step 5: Confirm reservation
         await confirm_reservation(page)
 
-        # For performance test
         end_time = time.perf_counter()
         print(f"[TIME] Total execution time ⏱ {end_time - start_time:.2f} sec")
-        
-        # For safety exit
-        print("[INFO] Wait for safty exit(3 sec)")
+
+        print("[INFO] Waiting 3 seconds before exit for safety.")
         await page.wait_for_timeout(waiting_sec)
         await browser.close()
 

@@ -49,14 +49,16 @@ playwright install
 ### 환경변수 설정
 
 ```bash
-cp info.env.example info.env        # macOS / Linux
-copy info.env.example info.env      # Windows
+cp info.env.example info1.env info2.env info3.env      # macOS / Linux
+copy info.env.example info1.env info2.env info3.env    # Windows
 ```
 
-`info.env` 파일을 열어 아래 값을 입력해 주세요:
+`info1.env ~ info3.env` 파일을 각각 열어 아래 값을 입력해 주세요:
 
 ```env
-PROJECT_DIR=/Users/yourname/path/to/autoBooking (autoBooking을 clone한 경로)
+USE= ※ 아래 옵션 중 선택 ※
+ON  :   예약 진행하기
+OFF :   예약 진행하지않기
 
 GYM= ※ 아래 옵션 중 선택 ※
 HIGASHI :   히가시 종합 체육관
@@ -104,6 +106,8 @@ TIME= ※ 아래 옵션 중 선택 ※
 
 ex. 9시 ~ 11시 선택 시
 TIME=9-11
+
+ROJECT_DIR=/Users/yourname/path/to/autoBooking (autoBooking의 절대경로 위치)
 ```
 
 ---
