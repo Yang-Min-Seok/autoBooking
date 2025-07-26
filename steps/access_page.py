@@ -4,11 +4,17 @@ async def access_target_page(page, gym):
     if gym == "HIGASHI":
         gym_no = 413
     
-    elif gym == "KAMEDA":
-        gym_no = 429
+    elif gym == "KITA":
+        gym_no = 408
 
     elif gym == "TOYANO":
         gym_no = 420
+
+    elif gym == "NISHI":
+        gym_no = 442
+
+    elif gym == "KAMEDA":
+        gym_no = 429
 
     else:
         print("[ERROR] Invalid GYM.")

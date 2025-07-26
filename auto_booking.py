@@ -35,9 +35,12 @@ GYM = os.getenv("GYM")
 # Set constants
 day_after               = 6
 waiting_sec             = 3000
+
 higashi_max_court_no    = 3
-toyano_max_court_no     = 6
 kameda_max_court_no     = 11
+toyano_max_court_no     = 6
+kita_max_court_no       = 3
+nishi_max_court_no      = 6
 
 async def main():
     # Validate court number based on gym
@@ -49,6 +52,12 @@ async def main():
         return
     elif GYM == "KAMEDA" and int(args.court) > kameda_max_court_no:
         print(f"[ERROR] Kameda Gym has maximum {kameda_max_court_no} courts.")
+        return
+    elif GYM == "KITA" and int(args.court) > kita_max_court_no:
+        print(f"[ERROR] Kameda Gym has maximum {kita_max_court_no} courts.")
+        return
+    elif GYM == "NISHI" and int(args.court) > nishi_max_court_no:
+        print(f"[ERROR] Kameda Gym has maximum {nishi_max_court_no} courts.")
         return
 
     start_time = time.perf_counter()
