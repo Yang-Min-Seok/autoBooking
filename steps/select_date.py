@@ -2,7 +2,7 @@
 
 # Set variables
 date_pos                   = 0
-badmintod_reserve_btn_pos  = 2
+badminton_reserve_btn_pos  = 2
 
 async def select_target_date(page, target_day_str):
     
@@ -11,9 +11,9 @@ async def select_target_date(page, target_day_str):
     
     for row in rows:
         day_cell = await row.locator("td").nth(date_pos).inner_text()
-        if target_day_str in day_cell:
+        if target_day_str == day_cell.strip():
             print(f"[INFO] Found matching row: {day_cell.strip()}")
-            reserve_button = row.locator("td").nth(badmintod_reserve_btn_pos).locator("a:has-text('予約')")
+            reserve_button = row.locator("td").nth(badminton_reserve_btn_pos).locator("a:has-text('予約')")
             if await reserve_button.count() > 0:
                 await reserve_button.click()
                 print("[INFO] Target reserve button clicked")
