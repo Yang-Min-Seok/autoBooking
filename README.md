@@ -141,12 +141,29 @@ start_booking.bat
 
 ---
 
+## 🌙 nightly_update.sh 권한 부여 및 테스트 실행
+> 자동 업데이트 스크립트인 nightly_update.sh는 다음 명령어로 실행 권한을 부여하고, 직접 실행하여 정상 동작을 확인할 수 있습니다.
+
+### macOS / Linux / Git Bash
+
+```bash
+chmod +x nightly_update.sh
+./nightly_update.sh
+```
+
+### Windows
+
+```cmd
+nightly_update.bat
+```
+
+---
+
 ## 🕑 자동 실행 예약
 
 > ⚠️ **예약 전날 MacBook을 닫아두면 예약이 실패할 수 있습니다.**  
 > 자동 실행을 위해서는 Mac이 잠자기 상태가 아니어야 하며, 화면이 꺼져 있어도 뚜껑이 닫힌 경우 cron 작업이 수행되지 않습니다.  
-> 반드시 예약 전날에는 **MacBook을 열어두거나 외부 모니터에 연결**해 주세요.
-
+> 반드시 예약 전날에는 **MacBook을 열어두거나 외부 모니터, 혹은 전원 케이블에 연결**해 주세요.
 
 ### macOS (cron 사용)
 
@@ -154,10 +171,14 @@ start_booking.bat
 crontab -e
 ```
 
-아래 라인 추가 (매주 토요일 오전 7시 실행):
+아래 라인 추가 (nightly update, 코트 예약):
 
 ```cron
-0 7 * * 6 /Users/yourname/autoBooking/start_booking.sh >> /Users/yourname/autoBooking/cron.log 2>&1
+# 매주 토요일 오전 7시: 예약 실행
+0 7 * * 6 /Users/yourname/autoBooking/start_booking.sh >> /Users/yourname/autoBooking/booking.log 2>&1
+
+# 매일 새벽 1시: nightly update 자동 실행
+0 1 * * * /Users/yourname/autoBooking/nightly_update.sh >> /Users/yourname/autoBooking/nightly_update.log 2>&1
 ```
 
 ### Windows (작업 스케줄러 사용)
@@ -165,7 +186,7 @@ crontab -e
 1. **작업 스케줄러** 실행  
 2. **기본 작업 만들기** 클릭  
 3. **트리거**: 매주 토요일 오전 7시 설정  
-4. **동작**: `start_booking.bat` 경로 지정 (예: `C:\\Users\\사용자이름\\autoBooking\\start_booking.bat`)  
+4. **동작**: `start_booking.bat`, `nightly_update.bat` 경로 지정 (예: `C:\\Users\\사용자이름\\autoBooking\\start_booking.bat`)  
 5. 완료 후, 스크립트가 매주 자동으로 실행됩니다 
 
 ---
@@ -176,6 +197,8 @@ crontab -e
 autoBooking/
 ├── auto_booking.py                # 예약 전체 실행 메인 파일
 ├── start_booking.sh               # macOS/Linux 실행용 스크립트
+├── nightly_update.sh              # macOS/Linux nightly update 실행용 스크립트
+├── nightly_update.bat             # Windows nightly update 실행용 스크립트
 ├── start_booking.bat              # Windows 실행용 스크립트
 │
 ├── steps/                         # STEP별 모듈화된 기능
@@ -206,6 +229,7 @@ autoBooking/
 | 2025-06-02 | 2.2.1  | 에러 대응, 안정성 형상 |
 | 2025-06-28 | 3.0.0  | 다중 코트 대응(3코트까지), 속도 개선 |
 | 2025-07-26 | 3.1.0  | 체육관 옵션 추가(西, 北), 날짜 버그 개선 |
+| 2025-07-27 | 3.2.0  | nightly update 기능 추가 |
 
 ---
 

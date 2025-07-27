@@ -142,12 +142,29 @@ start_booking.bat
 
 ---
 
+## 🌙 nightly_update.sh 権限付与及びテスト実行
+> 自動アップデートスクリプトのnightly_update.shは次のコマンドで実行権限を付与し、直接実行して通常動作を確認することができます
+
+### macOS / Linux / Git Bash
+
+```bash
+chmod +x nightly_update.sh
+./nightly_update.sh
+```
+
+### Windows
+
+```cmd
+nightly_update.bat
+```
+
+---
+
 ## 🕑 定期実行の設定
 
 > ⚠️ **前日にMacBookの蓋を閉じた状態では、予約が失敗する可能性があります。**  
 > cronによる自動実行には、Macがスリープ状態でないことが必要です。画面がオフでも蓋が閉じていると動作しません。  
-> 前日には**必ずMacBookの蓋を開けた状態にするか、外部モニターに接続**してください。
-
+> 前日には**必ずMacBookの蓋を開けた状態にするか、外部モニター、または電源ケーブルに接続**してください。
 
 ### macOS（cronを使用）
 
@@ -155,10 +172,14 @@ start_booking.bat
 crontab -e
 ```
 
-以下の行を追加（毎週土曜 午前7時実行）：
+以下の行を追加（nightly update、コート予約）：
 
 ```cron
-0 7 * * 6 /Users/yourname/autoBooking/start_booking.sh >> /Users/yourname/autoBooking/cron.log 2>&1
+# 毎週土曜午前7時：予約実行
+0 7 * * 6 /Users/yourname/autoBooking/start_booking.sh >> /Users/yourname/autoBooking/booking.log 2>&1
+
+# 毎日深夜1時：nightly update 実行
+0 1 * * * /Users/yourname/autoBooking/nightly_update.sh >> /Users/yourname/autoBooking/nightly_update.log 2>&1
 ```
 
 ### Windows（タスクスケジューラを使用）
@@ -166,7 +187,7 @@ crontab -e
 1. **タスクスケジューラ** を開く  
 2. **基本タスクの作成** をクリック  
 3. **トリガー**：毎週土曜日 午前7時 に設定  
-4. **操作**：`start_booking.bat` のパスを指定（例：`C:\\Users\\ユーザー名\\autoBooking\\start_booking.bat`）  
+4. **操作**：`start_booking.bat`、`nightly_update.bat` のパスを指定（例：`C:\\Users\\ユーザー名\\autoBooking\\start_booking.bat`）  
 5. 完了後、スクリプトが毎週自動的に実行されます
 
 ---
@@ -175,21 +196,23 @@ crontab -e
 
 ```
 autoBooking/
-├── auto_booking.py     # 自動予約のメインスクリプト
-├── start_booking.sh              # macOS/Linux用スクリプト
-├── start_booking.bat             # Windows用スクリプト
+├── auto_booking.py                 # 自動予約のメインスクリプト
+├── start_booking.sh                # macOS/Linux用スクリプト
+├── nightly_update.sh               # macOS/Linux nightly update用スクリプト
+├── nightly_update.bat              # Windows nightly update用スクリプト
+├── start_booking.bat               # Windows用スクリプト
 │
-├── steps/                         # 各STEPをモジュール化
-│   ├── access_page.py             # STEP 1 - ページアクセス
-│   ├── select_date.py             # STEP 2 - 日付選択と○予約クリック
-│   ├── select_time.py             # STEP 3 - 時間スロット選択
-│   ├── fill_form.py               # STEP 4 - 名前・電話番号・メール入力
-│   └── confirm_final.py           # STEP 5 - 最終確認ボタンクリック
+├── steps/                          # 各STEPをモジュール化
+│   ├── access_page.py              # STEP 1 - ページアクセス
+│   ├── select_date.py              # STEP 2 - 日付選択と○予約クリック
+│   ├── select_time.py              # STEP 3 - 時間スロット選択
+│   ├── fill_form.py                # STEP 4 - 名前・電話番号・メール入力
+│   └── confirm_final.py            # STEP 5 - 最終確認ボタンクリック
 │
-├── info.env.example               # 環境変数テンプレート
-├── requirements.txt               # パッケージリスト
-├── .gitignore                     # 除外設定
-└── README_JP.md                   # 日本語のマニュアル
+├── info.env.example                # 環境変数テンプレート
+├── requirements.txt                # パッケージリスト
+├── .gitignore                      # 除外設定
+└── README_JP.md                    # 日本語のマニュアル
 ```
 
 ---
@@ -207,6 +230,7 @@ autoBooking/
 | 2025-06-02  | 2.2.1      | エラー対応＆安定性向上 |
 | 2025-06-28  | 3.0.0      | 複数コート対応(３コートまで)、速度改善 |
 | 2025-07-26  | 3.1.0      | 体育館オプション追加（西、北）、日付バグ改善 |
+| 2025-07-27  | 3.2.0      | nightly update機能追加 |
 
 ---
 
