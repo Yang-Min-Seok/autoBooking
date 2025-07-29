@@ -33,7 +33,7 @@ E_MAIL = os.getenv("E_MAIL")
 GYM = os.getenv("GYM")
 
 # Set constants
-day_after               = 6
+day_after               = 7
 waiting_sec             = 3000
 
 higashi_max_court_no    = 3
