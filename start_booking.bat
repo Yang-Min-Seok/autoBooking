@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 REM Set base directory and log file
 set BASE_DIR=%~dp0
-set LOG_FILE=%BASE_DIR%cron.log
+set LOG_FILE=%BASE_DIR%booking.log
 
 REM Log start
 echo [%date% %time%] Booking script started. >> %LOG_FILE%

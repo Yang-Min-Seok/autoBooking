@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
-LOG_FILE="$BASE_DIR/cron.log"
+LOG_FILE="$BASE_DIR/booking.log"
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Booking script started." >> "$LOG_FILE"
 
