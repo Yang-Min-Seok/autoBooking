@@ -1,239 +1,90 @@
-# 📅 자동 예약 매크로 시스템 (autoBooking) KOREAN(🇰🇷)
+# 新潟市スポーツ施設自動予約マクロ
 
-웹사이트 예약을 자동으로 수행하는 Python 기반 자동화 스크립트입니다.  
-Playwright를 활용해 브라우저를 조작하고, `.env`로 개인정보를 관리하며, cron 또는 작업 스케줄러로 정기 실행이 가능합니다.
+新潟市のスポーツ施設の自動予約を実行するPythonマクロです。
 
----
+## 機能
 
-## 📦 설치 방법
+- 자동 예약 실행
+- CSRF 토큰 자동 처리
+- 세션 관리
+- confirm 모드에서 send 모드로 자동 전환
 
-### ✅ 클론 경로 주의
+## インストール
 
-> ❌ 한글 경로 및 클라우드 폴더 (예: `OneDrive`, `iCloud`, `문서`)에서 실행 시 실패 가능  
-> ✅ 영문 이름의 로컬 경로 추천: `C:\Projects`, `~/Projects` 등
+1. Python 3.7 이상이 설치되어 있는지 확인하세요.
 
-```bash
-git clone https://github.com/Yang-Min-Seok/autoBooking
-cd autoBooking
-```
-
----
-
-### 가상환경 생성 및 실행
-
-#### macOS / Linux / Git Bash
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-#### Windows
-
-```cmd
-python -m venv venv
-venv\Scripts\activate
-```
-
----
-
-### 패키지 설치
-
+2. 필요한 패키지를 설치하세요:
 ```bash
 pip install -r requirements.txt
-playwright install
 ```
 
----
+## 使用方法
 
-### 환경변수 설정
-
+### 기본 실행
 ```bash
-cp info.env.example info1.env info2.env info3.env      # macOS / Linux
-copy info.env.example info1.env info2.env info3.env    # Windows
+python niigata_macro.py
 ```
 
-`info1.env ~ info3.env` 파일을 각각 열어 아래 값을 입력해 주세요:
+### 예약 정보 수정
+`niigata_macro.py` 파일의 `main()` 함수에서 예약 정보를 수정하세요:
 
-```env
-USE= ※ 아래 옵션 중 선택 ※
-ON  :   예약 진행하기
-OFF :   예약 진행하지않기
-
-GYM= ※ 아래 옵션 중 선택 ※
-HIGASHI :   히가시 종합 체육관
-KAMEDA  :   카메다 종합 체육관
-TOYANO  :   토야노 종합 체육관
-KITA    :   키타지구 체육관
-NISHI   :   니시 종합 체육관
-
-ex. 히가시 종합 체육관 선택 시
-GYM=HIGASHI
-
-NAME=홍길동
-
-PHONE_NUMBER=01012345678
-
-E_MAIL=test@example.com
-
-COURT_NO= ※ 아래 옵션 중 선택 ※ (체육관 별 코트 수 주의)
-1       :   1번 코트
-2       :   2번 코트
-3       :   3번 코트
-
-== 여기서부터 토야노, 카메다 종합 체육관만 선택 가능 (요일에 따라 사용 가능한 코트수가 다르므로 주의) ==
-
-4       :   4번 코트
-5       :   5번 코트
-6       :   6번 코트
-
-== 여기서부터 카메다 종합 체육관만 선택 가능 ==
-
-7       :   7번 코트
-8       :   8번 코트
-9       :   9번 코트
-10      :   10번 코트
-11      :   11번 코트
-
-ex. 3번 코트 선택 시
-COURT_NO=3
-
-TIME= ※ 아래 옵션 중 선택 ※
-9-11    :   09시 ~ 11시
-11-13   :   11시 ~ 13시
-13-15   :   13시 ~ 15시
-15-17   :   15시 ~ 17시
-17-19   :   17시 ~ 19시
-19-21   :   19시 ~ 21시
-
-ex. 9시 ~ 11시 선택 시
-TIME=9-11
-
-ROJECT_DIR=/Users/yourname/path/to/autoBooking (autoBooking의 절대경로 위치)
+```python
+success = macro.make_reservation(
+    course_time_id=250345,           # 코스 시간 ID
+    facility_name='鳥屋野総合体育館',  # 시설명
+    facility_id=420,                # 시설 ID
+    date='2025年10月15日（水）',       # 예약 날짜
+    equipment='バドミントン',         # 장비
+    course_name='バドミントン 1',     # 코스명
+    course_time_name='9-11時',       # 시간대
+    name='apple',                    # 예약자명
+    tel='0123456789',               # 전화번호
+    email='jeongwonjun0718@gmail.com' # 이메일
+)
 ```
 
----
+## 작동 원리
 
-## 🧪 실행 전 테스트
+1. **CSRF 토큰 획득**: 예약 페이지에 접근하여 CSRF 토큰을 획득
+2. **Confirm 모드**: 예약 정보를 confirm 모드로 전송
+3. **예약자 정보 페이지**: 예약자 정보 입력 페이지로 이동
+4. **Send 모드**: 폼 데이터를 수집하여 send 모드로 예약 실행
 
-> Playwright 브라우저가 정상 작동하는지 먼저 확인하세요.
-
-```bash
-python3 auto_booking.py
-```
-
----
-
-## 🚀 자동 예약 실행
-
-### macOS / Linux / Git Bash
-
-```bash
-chmod +x start_booking.sh
-./start_booking.sh
-```
-
-### Windows
-
-```cmd
-start_booking.bat
-```
-
----
-
-## 🌙 nightly_update.sh 권한 부여 및 테스트 실행
-> 자동 업데이트 스크립트인 nightly_update.sh는 다음 명령어로 실행 권한을 부여하고, 직접 실행하여 정상 동작을 확인할 수 있습니다.
-
-### macOS / Linux / Git Bash
-
-```bash
-chmod +x nightly_update.sh
-./nightly_update.sh
-```
-
-### Windows
-
-```cmd
-nightly_update.bat
-```
-
----
-
-## 🕑 자동 실행 예약
-
-> ⚠️ **예약 전날 MacBook을 닫아두면 예약이 실패할 수 있습니다.**  
-> 자동 실행을 위해서는 Mac이 잠자기 상태가 아니어야 하며, 화면이 꺼져 있어도 뚜껑이 닫힌 경우 cron 작업이 수행되지 않습니다.  
-> 반드시 예약 전날에는 **MacBook을 열어두거나 외부 모니터, 혹은 전원 케이블에 연결**해 주세요.
-
-### macOS (cron 사용)
-
-```bash
-crontab -e
-```
-
-아래 라인 추가 (nightly update, 코트 예약):
-
-```cron
-# 매주 토요일 오전 7시: 예약 실행
-0 7 * * 6 /Users/yourname/autoBooking/start_booking.sh >> /Users/yourname/autoBooking/booking.log 2>&1
-
-# 매일 새벽 1시: nightly update 자동 실행
-0 1 * * * /Users/yourname/autoBooking/nightly_update.sh >> /Users/yourname/autoBooking/nightly_update.log 2>&1
-```
-
-### Windows (작업 스케줄러 사용)
-
-1. **작업 스케줄러** 실행  
-2. **기본 작업 만들기** 클릭  
-3. **트리거**: 매주 토요일 오전 7시 설정  
-4. **동작**: `start_booking.bat`, `nightly_update.bat` 경로 지정 (예: `C:\\Users\\사용자이름\\autoBooking\\start_booking.bat`)  
-5. 완료 후, 스크립트가 매주 자동으로 실행됩니다 
-
----
-
-## 📁 디렉토리 구조
+## 파일 구조
 
 ```
-autoBooking/
-├── auto_booking.py                # 예약 전체 실행 메인 파일
-├── start_booking.sh               # macOS/Linux 실행용 스크립트
-├── nightly_update.sh              # macOS/Linux nightly update 실행용 스크립트
-├── nightly_update.bat             # Windows nightly update 실행용 스크립트
-├── start_booking.bat              # Windows 실행용 스크립트
-│
-├── steps/                         # STEP별 모듈화된 기능
-│   ├── access_page.py             # STEP 1 - 예약 페이지 접속
-│   ├── select_date.py             # STEP 2 - 날짜 탐색 및 ○예약 클릭
-│   ├── select_time.py             # STEP 3 - 시간 선택
-│   ├── fill_form.py               # STEP 4 - 이름, 전화번호, 이메일 입력
-│   └── confirm_final.py           # STEP 5 - 최종 예약 버튼 클릭
-│
-├── info.env.example               # 환경변수 템플릿
-├── requirements.txt               # 의존 패키지 목록
-├── .gitignore                     # Git 제외 설정
-└── README.md                      # 설명서 (Korean)
+.
+├── niigata_macro.py      # 메인 매크로
+├── advanced_macro.py     # 고급 기능 매크로 (선택사항)
+├── config.json          # 설정 파일 (선택사항)
+├── requirements.txt     # 필요한 패키지 목록
+├── README.md           # 사용 설명서
+└── reservation.log     # 실행 로그 (자동 생성)
 ```
 
----
+## 注意事項
 
-## 📌 버전 기록
+1. **Rate Limit**: 新潟市のサイトは分당 5회 요청 제한이 있습니다.
+2. **CSRF 토큰**: 매 요청마다 새로운 CSRF 토큰이 필요합니다.
+3. **세션 관리**: 세션 쿠키를 올바르게 관리해야 합니다.
 
-| 날짜       | 버전   | 변경 내용                               |
-|------------|--------|------------------------------------------|
-| 2025-04-09 | 1.0.0  | 첫 배포 (Selenium 기반) |
-| 2025-04-13 | 1.0.1  | Selenium 기반 속도 개선 |
-| 2025-04-14 | 2.0.0  | Playwright 버전 도입 및 속도 개선 |
-| 2025-04-19 | 2.0.1  | 코트, 시간 지정 기능 추가, 매직넘버 변수화 |
-| 2025-04-23 | 2.1.1  | 체육관 지정 기능 추가(카메다), 예약 실패 반응 속도 단축 |
-| 2025-05-10 | 2.2.0  | 체육관 옵션 추가(토야노) |
-| 2025-06-02 | 2.2.1  | 에러 대응, 안정성 형상 |
-| 2025-06-28 | 3.0.0  | 다중 코트 대응(3코트까지), 속도 개선 |
-| 2025-07-26 | 3.1.0  | 체육관 옵션 추가(西, 北), 날짜 버그 개선 |
-| 2025-07-27 | 3.2.0  | nightly update 기능 추가 |
+## トラブルシューティング
 
----
+### 일반적인 문제
 
-## ✅ 라이선스 및 제작자
+1. **CSRF 토큰 오류**
+   - 예약 페이지에 먼저 접근하여 토큰을 획득하세요.
 
-- Maintained by [kurooru]  
-- License: kurooru
+2. **세션 만료**
+   - 프로그램을 재시작하거나 세션을 갱신하세요.
+
+3. **Rate Limit 초과**
+   - 요청 간격을 늘리거나 재시도 간격을 조정하세요.
+
+### 로그 확인
+
+실행 로그는 `reservation.log` 파일에 저장됩니다. 문제 발생 시 이 파일을 확인하세요.
+
+## 免責事項
+
+이 도구는 교육 목적으로 제작되었습니다. 사용자는 해당 사이트의 이용약관을 준수할 책임이 있으며, 사용으로 인한 모든 결과에 대해 사용자가 책임집니다.
