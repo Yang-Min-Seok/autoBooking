@@ -11,6 +11,7 @@ from modules.get_reservation_ids import get_reservation_ids_by_time_slot
 from modules.niigata_macro import NiigataReservationMacro
 
 # Define constants
+DAY_AFTER = 7 
 EQUIPMENT = 'バドミントン'
 WEEKDAY_MAP = ['月', '火', '水', '木', '金', '土', '日']
 
@@ -66,9 +67,9 @@ def load_user_data(json_file='my_data.json'):
 # Get date and time from user data
 def parse_date_and_time(user_data):
     try:
-        # Set date_obj to 7 days after today
+        # Set date_obj to DAY_AFTER days after today
         today = datetime.now()
-        date_obj = today + timedelta(days=7)
+        date_obj = today + timedelta(days=DAY_AFTER)
         day = str(date_obj.day)
         time_slot = f"{user_data['TIME']}時"
         facility_name = user_data['FACILITY_NAME']

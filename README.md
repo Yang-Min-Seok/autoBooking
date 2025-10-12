@@ -49,10 +49,52 @@ cp my_data.json.sample my_data.json
 - `FACILITY_NAME`: 체육관 키워드 (위 예시 참고)
 - `COURT_NO`: 예약할 코트 개수(생략 시 1)
 
+
 ### 2. 프로그램 실행
+#### (1) 직접 실행
 ```bash
 python main.py
 ```
+
+#### (2) 스크립트로 실행 (권장)
+운영체제에 맞는 스크립트를 사용하세요:
+
+##### macOS/Linux
+```bash
+# 최초 1회만 실행 권한 부여
+chmod +x start_booking.sh nightly_update.sh
+
+# 실행
+sh start_booking.sh
+```
+
+##### Windows
+```cmd
+start_booking.bat
+```
+
+#### (3) 예약 실행(자동화)
+##### macOS: cron 등록 예시
+```bash
+crontab -e
+# 매주 토요일 오전 7시 예약 실행
+0 7 * * 6 cd /Users/yourname/autoBooking && sh start_booking.sh
+ 
+# 매일 새벽 1시 자동 업데이트 (main 브랜치 최신화)
+0 1 * * * cd /Users/yourname/autoBooking && sh nightly_update.sh
+```
+
+##### Windows: 작업 스케줄러 등록
+1. 작업 스케줄러 실행 → "기본 작업 만들기" 클릭
+2. 트리거: 원하는 예약 시간 설정(예: 매주 토요일 오전 7시)
+3. 동작: 프로그램/스크립트에 `start_booking.bat` 경로 지정
+4. 완료 후 자동 실행
+
+##### Windows: 자동 업데이트 등록 예시
+1. 작업 스케줄러 실행 → "기본 작업 만들기" 클릭
+2. 트리거: 매일 새벽 1시로 설정
+3. 동작: 프로그램/스크립트에 `nightly_update.bat` 경로 지정
+4. 완료 후 자동 실행
 
 ### 3. 실행 결과 확인
 콘솔 및 `reservation.log` 파일에서 예약 결과를 확인할 수 있습니다.

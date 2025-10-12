@@ -49,9 +49,50 @@ cp my_data.json.sample my_data.json
 - `COURT_NO`: 予約したいコート数（省略時は1）
 
 ### 2. プログラムの実行
+#### (1) 直接実行
 ```bash
 python main.py
 ```
+
+#### (2) スクリプトで実行（推奨）
+OSに合わせて以下のスクリプトを利用してください：
+
+##### macOS/Linux
+```bash
+# 初回のみ実行権限を付与
+chmod +x start_booking.sh nightly_update.sh
+
+# 実行
+sh start_booking.sh
+```
+
+##### Windows
+```cmd
+start_booking.bat
+```
+
+#### (3) 予約実行（自動化）
+##### macOS: cron 登録例
+```bash
+crontab -e
+# 毎週土曜午前7時に予約実行
+0 7 * * 6 cd /Users/yourname/autoBooking && sh start_booking.sh
+
+# 毎日午前1時に自動アップデート（mainブランチ最新化）
+0 1 * * * cd /Users/yourname/autoBooking && sh nightly_update.sh
+```
+
+##### Windows: タスクスケジューラ登録
+1. タスクスケジューラを起動 → 「基本タスクの作成」クリック
+2. トリガー：希望の予約時間を設定（例：毎週土曜午前7時）
+3. 操作：プログラム/スクリプトに `start_booking.bat` のパスを指定
+4. 完了後、自動実行されます
+
+##### Windows: 自動アップデート登録例
+1. タスクスケジューラを起動 → 「基本タスクの作成」クリック
+2. トリガー：毎日午前1時に設定
+3. 操作：プログラム/スクリプトに `nightly_update.bat` のパスを指定
+4. 完了後、自動実行されます
 
 ### 3. 実行結果の確認
 コンソールや`reservation.log`ファイルで予約結果を確認できます。
