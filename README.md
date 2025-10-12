@@ -1,239 +1,147 @@
-# 📅 자동 예약 매크로 시스템 (autoBooking) KOREAN(🇰🇷)
+# 니이가타 배드민턴 자동 예약 시스템
 
-웹사이트 예약을 자동으로 수행하는 Python 기반 자동화 스크립트입니다.  
-Playwright를 활용해 브라우저를 조작하고, `.env`로 개인정보를 관리하며, cron 또는 작업 스케줄러로 정기 실행이 가능합니다.
+니이가타시 스포츠 시설 배드민턴 코트를 자동으로 예약하는 Python 프로그램입니다.
 
----
+## 주요 기능
 
-## 📦 설치 방법
+- 원하는 날짜(오늘 기준 7일 뒤)와 시간대의 배드민턴 코트 자동 예약
+- 예약 가능한 코트 자동 검색 및 여러 코트 동시 예약 (COURT_NO 지정)
+- FACILITY_NAME, FACILITY_ID 키워드 자동 매핑 지원 (예: HIGASHI, KITA 등)
+- CSRF 토큰 자동 처리 및 예약 성공 여부 로깅
+- 빠른 예약 처리 (1~2초 내)
 
-### ✅ 클론 경로 주의
+## 설치 방법
 
-> ❌ 한글 경로 및 클라우드 폴더 (예: `OneDrive`, `iCloud`, `문서`)에서 실행 시 실패 가능  
-> ✅ 영문 이름의 로컬 경로 추천: `C:\Projects`, `~/Projects` 등
+### 1. Python 설치
+Python 3.7 이상이 필요합니다.
 
-```bash
-git clone https://github.com/Yang-Min-Seok/autoBooking
-cd autoBooking
-```
-
----
-
-### 가상환경 생성 및 실행
-
-#### macOS / Linux / Git Bash
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-#### Windows
-
-```cmd
-python -m venv venv
-venv\Scripts\activate
-```
-
----
-
-### 패키지 설치
-
+### 2. 필요한 라이브러리 설치
 ```bash
 pip install -r requirements.txt
-playwright install
 ```
 
----
+## 사용 방법
 
-### 환경변수 설정
 
+### 1. 예약 정보 입력
+1) 샘플 파일 복사
 ```bash
-cp info.env.example info1.env info2.env info3.env      # macOS / Linux
-copy info.env.example info1.env info2.env info3.env    # Windows
+cp my_data.json.sample my_data.json
+```
+2) `my_data.json` 파일을 아래와 같이 수정합니다:
+
+```json
+{
+  "NAME": "홍길동",
+  "PHONE_NUMBER": "01012345678",
+  "E_MAIL": "your-email@gmail.com",
+  "TIME": "15-17",
+  "FACILITY_NAME": "TOYANO",  // HIGASHI, KITA, TOYANO, NISHI, KAMEDA 중 택1
+  "COURT_NO": "2"              // 예약할 코트 개수(기본값 1)
+}
 ```
 
-`info1.env ~ info3.env` 파일을 각각 열어 아래 값을 입력해 주세요:
+**필드 설명:**
+- `NAME`: 예약자 이름
+- `PHONE_NUMBER`: 전화번호 (하이픈 없이 입력)
+- `E_MAIL`: 이메일 주소
+- `TIME`: 예약 시간대 (예: "9-11", "13-15", "15-17")
+- `FACILITY_NAME`: 체육관 키워드 (위 예시 참고)
+- `COURT_NO`: 예약할 코트 개수(생략 시 1)
 
-```env
-USE= ※ 아래 옵션 중 선택 ※
-ON  :   예약 진행하기
-OFF :   예약 진행하지않기
-
-GYM= ※ 아래 옵션 중 선택 ※
-HIGASHI :   히가시 종합 체육관
-KAMEDA  :   카메다 종합 체육관
-TOYANO  :   토야노 종합 체육관
-KITA    :   키타지구 체육관
-NISHI   :   니시 종합 체육관
-
-ex. 히가시 종합 체육관 선택 시
-GYM=HIGASHI
-
-NAME=홍길동
-
-PHONE_NUMBER=01012345678
-
-E_MAIL=test@example.com
-
-COURT_NO= ※ 아래 옵션 중 선택 ※ (체육관 별 코트 수 주의)
-1       :   1번 코트
-2       :   2번 코트
-3       :   3번 코트
-
-== 여기서부터 토야노, 카메다 종합 체육관만 선택 가능 (요일에 따라 사용 가능한 코트수가 다르므로 주의) ==
-
-4       :   4번 코트
-5       :   5번 코트
-6       :   6번 코트
-
-== 여기서부터 카메다 종합 체육관만 선택 가능 ==
-
-7       :   7번 코트
-8       :   8번 코트
-9       :   9번 코트
-10      :   10번 코트
-11      :   11번 코트
-
-ex. 3번 코트 선택 시
-COURT_NO=3
-
-TIME= ※ 아래 옵션 중 선택 ※
-9-11    :   09시 ~ 11시
-11-13   :   11시 ~ 13시
-13-15   :   13시 ~ 15시
-15-17   :   15시 ~ 17시
-17-19   :   17시 ~ 19시
-19-21   :   19시 ~ 21시
-
-ex. 9시 ~ 11시 선택 시
-TIME=9-11
-
-ROJECT_DIR=/Users/yourname/path/to/autoBooking (autoBooking의 절대경로 위치)
-```
-
----
-
-## 🧪 실행 전 테스트
-
-> Playwright 브라우저가 정상 작동하는지 먼저 확인하세요.
-
+### 2. 프로그램 실행
 ```bash
-python3 auto_booking.py
+python main.py
 ```
 
----
+### 3. 실행 결과 확인
+콘솔 및 `reservation.log` 파일에서 예약 결과를 확인할 수 있습니다.
 
-## 🚀 자동 예약 실행
-
-### macOS / Linux / Git Bash
-
-```bash
-chmod +x start_booking.sh
-./start_booking.sh
-```
-
-### Windows
-
-```cmd
-start_booking.bat
-```
-
----
-
-## 🌙 nightly_update.sh 권한 부여 및 테스트 실행
-> 자동 업데이트 스크립트인 nightly_update.sh는 다음 명령어로 실행 권한을 부여하고, 직접 실행하여 정상 동작을 확인할 수 있습니다.
-
-### macOS / Linux / Git Bash
-
-```bash
-chmod +x nightly_update.sh
-./nightly_update.sh
-```
-
-### Windows
-
-```cmd
-nightly_update.bat
-```
-
----
-
-## 🕑 자동 실행 예약
-
-> ⚠️ **예약 전날 MacBook을 닫아두면 예약이 실패할 수 있습니다.**  
-> 자동 실행을 위해서는 Mac이 잠자기 상태가 아니어야 하며, 화면이 꺼져 있어도 뚜껑이 닫힌 경우 cron 작업이 수행되지 않습니다.  
-> 반드시 예약 전날에는 **MacBook을 열어두거나 외부 모니터, 혹은 전원 케이블에 연결**해 주세요.
-
-### macOS (cron 사용)
-
-```bash
-crontab -e
-```
-
-아래 라인 추가 (nightly update, 코트 예약):
-
-```cron
-# 매주 토요일 오전 7시: 예약 실행
-0 7 * * 6 /Users/yourname/autoBooking/start_booking.sh >> /Users/yourname/autoBooking/booking.log 2>&1
-
-# 매일 새벽 1시: nightly update 자동 실행
-0 1 * * * /Users/yourname/autoBooking/nightly_update.sh >> /Users/yourname/autoBooking/nightly_update.log 2>&1
-```
-
-### Windows (작업 스케줄러 사용)
-
-1. **작업 스케줄러** 실행  
-2. **기본 작업 만들기** 클릭  
-3. **트리거**: 매주 토요일 오전 7시 설정  
-4. **동작**: `start_booking.bat`, `nightly_update.bat` 경로 지정 (예: `C:\\Users\\사용자이름\\autoBooking\\start_booking.bat`)  
-5. 완료 후, 스크립트가 매주 자동으로 실행됩니다 
-
----
-
-## 📁 디렉토리 구조
+## 프로그램 구조
 
 ```
-autoBooking/
-├── auto_booking.py                # 예약 전체 실행 메인 파일
-├── start_booking.sh               # macOS/Linux 실행용 스크립트
-├── nightly_update.sh              # macOS/Linux nightly update 실행용 스크립트
-├── nightly_update.bat             # Windows nightly update 실행용 스크립트
-├── start_booking.bat              # Windows 실행용 스크립트
-│
-├── steps/                         # STEP별 모듈화된 기능
-│   ├── access_page.py             # STEP 1 - 예약 페이지 접속
-│   ├── select_date.py             # STEP 2 - 날짜 탐색 및 ○예약 클릭
-│   ├── select_time.py             # STEP 3 - 시간 선택
-│   ├── fill_form.py               # STEP 4 - 이름, 전화번호, 이메일 입력
-│   └── confirm_final.py           # STEP 5 - 최종 예약 버튼 클릭
-│
-├── info.env.example               # 환경변수 템플릿
-├── requirements.txt               # 의존 패키지 목록
-├── .gitignore                     # Git 제외 설정
-└── README.md                      # 설명서 (Korean)
+├── main.py                    # 메인 실행 파일
+├── modules/
+│   ├── get_date_id.py            # 날짜 ID 조회 모듈
+│   ├── get_reservation_ids.py    # 예약 가능한 코트 조회 모듈
+│   └── niigata_macro.py          # 예약 실행 모듈
+├── my_data.json              # 사용자 예약 정보
+├── requirements.txt          # 필요한 라이브러리 목록
+├── README.md                 # 사용 설명서
+└── reservation.log           # 실행 로그 (자동 생성)
 ```
 
----
+## 작동 원리
 
-## 📌 버전 기록
+1. **날짜 ID 조회**: 예약하려는 날짜(오늘+5일)의 고유 ID를 웹사이트에서 조회
+2. **코트 검색**: 해당 날짜와 시간대에 예약 가능한 코트 검색
+3. **CSRF 토큰 획득**: 예약 페이지에서 보안 토큰 획득
+4. **예약 확인/실행**: 예약 정보를 전송하여 예약 완료
 
-| 날짜       | 버전   | 변경 내용                               |
-|------------|--------|------------------------------------------|
-| 2025-04-09 | 1.0.0  | 첫 배포 (Selenium 기반) |
-| 2025-04-13 | 1.0.1  | Selenium 기반 속도 개선 |
-| 2025-04-14 | 2.0.0  | Playwright 버전 도입 및 속도 개선 |
-| 2025-04-19 | 2.0.1  | 코트, 시간 지정 기능 추가, 매직넘버 변수화 |
-| 2025-04-23 | 2.1.1  | 체육관 지정 기능 추가(카메다), 예약 실패 반응 속도 단축 |
-| 2025-05-10 | 2.2.0  | 체육관 옵션 추가(토야노) |
-| 2025-06-02 | 2.2.1  | 에러 대응, 안정성 형상 |
-| 2025-06-28 | 3.0.0  | 다중 코트 대응(3코트까지), 속도 개선 |
-| 2025-07-26 | 3.1.0  | 체육관 옵션 추가(西, 北), 날짜 버그 개선 |
-| 2025-07-27 | 3.2.0  | nightly update 기능 추가 |
+## 예약 가능 시간대
 
----
+- 9-11시
+- 11-13시
+- 13-15시
+- 15-17시
+- 17-19시
+- 19-21시
 
-## ✅ 라이선스 및 제작자
+## 주의사항
 
-- Maintained by [kurooru]  
-- License: kurooru
+⚠️ **중요한 제한사항**
+
+1. **Rate Limit**: 웹사이트는 분당 약 5회 요청 제한이 있습니다. 너무 자주 실행하면 429 에러가 발생할 수 있습니다.
+2. **예약 가능 기간**: 웹사이트의 예약 가능 기간 정책을 따릅니다.
+3. **중복 예약 방지**: 이미 예약된 코트는 자동으로 예약할 수 없습니다.
+4. **코트 선택**: 여러 코트가 비어있을 경우 COURT_NO만큼 순서대로 예약합니다.
+
+## 문제 해결
+
+### 예약 가능한 코트가 없다고 나올 때
+- 해당 시간대의 모든 코트가 이미 예약된 상태입니다.
+- 다른 시간대를 선택하거나 다른 날짜를 시도해보세요.
+
+### 429 에러가 발생할 때
+- 너무 많은 요청을 보낸 경우입니다.
+- 30초~1분 정도 기다린 후 다시 시도하세요.
+
+### CSRF 토큰 오류
+- 웹사이트 세션이 만료된 경우입니다.
+- 프로그램을 다시 실행하면 자동으로 해결됩니다.
+
+### ValueError: too many values to unpack
+- `get_reservation_ids.py` 파일이 업데이트되지 않은 경우입니다.
+- 최신 버전의 파일로 교체해주세요.
+
+## 로그 확인
+
+`reservation.log` 파일에서 다음 정보를 확인할 수 있습니다:
+- 날짜 ID 조회 결과
+- 예약 가능한 코트 목록 (코트 번호 포함)
+- 선택된 코트 정보
+- CSRF 토큰 획득 여부
+- 예약 요청 응답 코드
+- 예약 성공/실패 여부
+- 총 소요 시간
+
+**로그 예시:**
+```
+2025-10-12 01:42:02,844 - INFO - 예약 가능한 코트들: ['バドミントン 1 (ID: 250514)', 'バドミントン 2 (ID: 250521)']
+2025-10-12 01:42:02,844 - INFO - 선택된 코트: バドミントン 1 (ID: 250514)
+2025-10-12 01:42:02,844 - INFO - 예약 완료 - 코트: バドミントン 1
+2025-10-12 01:42:02,845 - INFO - === 예약이 성공적으로 완료되었습니다! ===
+2025-10-12 01:42:02,845 - INFO - 예약된 코트: バドミントン 1
+2025-10-12 01:42:02,845 - INFO - 총 소요 시간: 1.56초
+```
+
+## 성공 예시
+
+```
+[성공] 예약이 성공적으로 완료되었습니다!
+예약 코트: バドミントン 1
+소요시간: 1.56초
+```
+
+
+
