@@ -75,7 +75,7 @@ def parse_date_and_time(user_data):
         facility_name = user_data['FACILITY_NAME']
         facility_id = user_data['FACILITY_ID']
 
-        logger.info(f"[INFO] Parsed information - date: {day}th, time slot: {time_slot} {date_obj.strftime('%Y-%m-%d')}")
+        logger.info(f"[INFO] Parsed information - date: {day}th, time slot: {time_slot}, facility: {facility_name} {date_obj.strftime('%Y-%m-%d')}")
         return day, time_slot, date_obj, facility_name, facility_id
 
     except Exception as e:
