@@ -41,33 +41,36 @@ def get_badminton_date_id(target_day, facility_id):
         response.raise_for_status()
         
         soup = BeautifulSoup(response.text, 'html.parser')
-        schedule_table = soup.find('table', class_='c-table01')
+        schedule_tables = soup.find_all('table', class_='c-table01')
         
-        if not schedule_table:
+        if not schedule_tables:
+            print(f"No schedule tables found")
             return None
         
-        for row in schedule_table.find_all('tr'):
-            day_cell = row.find('td', class_='day-sticky')
-            if not day_cell:
-                continue
-            
-            day_match = re.search(r'(\d+)日', day_cell.get_text(strip=True))
-            if not day_match or day_match.group(1) != str(target_day):
-                continue
-            
-            cells = row.find_all('td')
-            if len(cells) < 3:
-                continue
-            
-            badminton_cell = cells[2]
-            reserve_link = badminton_cell.find('a', href=True)
-            
-            if reserve_link:
-                href = reserve_link['href']
-                match = re.search(r'/schedule/course/(\d+)/1', href)
-                if match:
-                    return match.group(1)
+        for schedule_table in schedule_tables:
+            for row in schedule_table.find_all('tr'):
+                day_cell = row.find('td', class_='day-sticky')
+                if not day_cell:
+                    continue
+                
+                day_match = re.search(r'(\d+)日', day_cell.get_text(strip=True))
+                if not day_match or day_match.group(1) != str(target_day):
+                    continue
+                
+                cells = row.find_all('td')
+                if len(cells) < 3:
+                    continue
+                
+                badminton_cell = cells[2]
+                reserve_link = badminton_cell.find('a', href=True)
+                
+                if reserve_link:
+                    href = reserve_link['href']
+                    match = re.search(r'/schedule/course/(\d+)/1', href)
+                    if match:
+                        return match.group(1)
         
+        print(f"Target day {target_day} not found in any schedule table")
         return None
         
     except Exception as e:

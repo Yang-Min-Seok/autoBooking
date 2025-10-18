@@ -2,7 +2,13 @@
 setlocal
 
 REM Log file path
-set LOG_FILE=%~dp0nightly_update.log
+set LOG_DIR=%~dp0logs
+set LOG_FILE=%LOG_DIR%\nightly_update.log
+
+rem Ensure logs directory exists
+if not exist "%LOG_DIR%" (
+	mkdir "%LOG_DIR%"
+)
 
 cd /d %~dp0
 

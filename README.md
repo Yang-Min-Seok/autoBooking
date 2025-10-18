@@ -20,82 +20,101 @@ Python 3.7 이상이 필요합니다.
 pip install -r requirements.txt
 ```
 
-## 사용 방법
+## 전체 환경 구축
 
-### 1. 예약 정보 입력
-1) 샘플 파일 복사
+아래는 전체 환경을 처음부터 구성하는 간단한 순서입니다.
+
+1) 코드 클론/복사 및 작업 디렉터리로 이동
+
+```bash
+git clone <repo-url> /path/to/autoBooking
+cd /path/to/autoBooking
+```
+
+2) Python 설치 및 의존성 설치
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+3) 설정 파일 복사
+
 ```bash
 cp my_data.json.sample my_data.json
-```
-2) `my_data.json` 파일을 아래와 같이 수정합니다:
-
-```json
-{
-  "NAME": "홍길동",
-  "PHONE_NUMBER": "01012345678",
-  "E_MAIL": "your-email@gmail.com",
-  "TIME": "15-17",
-  "FACILITY_NAME": "TOYANO",  // HIGASHI, KITA, TOYANO, NISHI, KAMEDA 중 택1
-  "COURT_NO": "2"              // 예약할 코트 개수(기본값 1)
-}
+# my_data.json을 편집하여 예약자 정보, 시간, 시설 등을 설정하세요.
 ```
 
-**필드 설명:**
-- `NAME`: 예약자 이름
-- `PHONE_NUMBER`: 전화번호 (하이픈 없이 입력)
-- `E_MAIL`: 이메일 주소
-- `TIME`: 예약 시간대 (예: "9-11", "13-15", "15-17")
-- `FACILITY_NAME`: 체육관 키워드 (위 예시 참고)
-- `COURT_NO`: 예약할 코트 개수(생략 시 1)
+4) 로그 디렉터리 확인
 
-### 2. 프로그램 실행
-#### (1) 직접 실행
 ```bash
-python main.py
+mkdir -p logs
 ```
 
-#### (2) 스크립트로 실행 (권장)
-운영체제에 맞는 스크립트를 사용하세요:
+## start_booking 실행 및 예약 방법
 
-##### macOS/Linux
+`start_booking.sh`은 예약을 시작하기 위한 스크립트입니다. 보통 cron에서 실행하도록 설정합니다. 스크립트는 내부적으로 07:00까지 대기하도록 구현되어 있으므로, 예약을 안정적으로 시작하려면 약간 앞서 실행되게 cron에 등록하세요.
+
+1) 스크립트 권한 부여 및 수동 실행 테스트
+
 ```bash
-# 최초 1회만 실행 권한 부여
-chmod +x start_booking.sh nightly_update.sh
-
-# 실행
+chmod +x start_booking.sh
 sh start_booking.sh
 ```
 
-##### Windows
-```cmd
-start_booking.bat
-```
+2) crontab에 등록 (예: 매주 토요일 06:59에 실행)
 
-#### (3) 예약 실행(자동화)
-##### macOS: cron 등록 예시
 ```bash
 crontab -e
-# 매주 토요일 오전 7시 예약 실행
-0 7 * * 6 cd /Users/yourname/autoBooking && sh start_booking.sh
- 
-# 매일 새벽 1시 자동 업데이트 (main 브랜치 최신화)
-0 1 * * * cd /Users/yourname/autoBooking && sh nightly_update.sh
+
+# 매주 토요일 06:59에 실행 (로그 리다이렉트)
+59 6 * * 6 cd /Users/<your-username>/Desktop/autoBooking && sh start_booking.sh >> /Users/<your-username>/Desktop/autoBooking/logs/reservation.log 2>&1
 ```
 
-##### Windows: 작업 스케줄러 등록
-1. 작업 스케줄러 실행 → "기본 작업 만들기" 클릭
-2. 트리거: 원하는 예약 시간 설정(예: 매주 토요일 오전 7시)
-3. 동작: 프로그램/스크립트에 `start_booking.bat` 경로 지정
-4. 완료 후 자동 실행
+3) 등록 확인
 
-##### Windows: 자동 업데이트 등록 예시
-1. 작업 스케줄러 실행 → "기본 작업 만들기" 클릭
-2. 트리거: 매일 새벽 1시로 설정
-3. 동작: 프로그램/스크립트에 `nightly_update.bat` 경로 지정
-4. 완료 후 자동 실행
+```bash
+crontab -l
+```
 
-### 3. 실행 결과 확인
-콘솔 및 `reservation.log` 파일에서 예약 결과를 확인할 수 있습니다.
+참고:
+- crontab에서 실행 시 절대 경로를 사용하세요. 가상환경을 사용하는 경우 `cd` 후 `source venv/bin/activate`를 추가하거나 스크립트 내에 가상환경 활성화 로직을 넣어주세요.
+- 스크립트를 07:00 전에 실행하면 `main.py`의 내부 대기 로직이 정확히 07:00에 예약 프로세스를 시작합니다.
+
+## nightly_update 실행 및 예약 방법
+
+자동 업데이트 스크립트인 `nightly_update.sh`는 매주 또는 매일 정기적으로 실행하도록 cron에 등록할 수 있습니다.
+
+1) 스크립트 권한 부여 및 수동 실행 테스트
+
+```bash
+chmod +x nightly_update.sh
+sh nightly_update.sh
+```
+
+2) crontab 예시 (매일 01:00에 실행)
+
+```bash
+crontab -e
+
+# 매일 01:00에 실행: 디렉터리 이동 후 스크립트 실행
+0 1 * * * cd /Users/<your-username>/Desktop/autoBooking && sh nightly_update.sh >> /Users/<your-username>/Desktop/autoBooking/logs/nightly_update.log 2>&1
+```
+
+3) 등록 확인
+
+```bash
+crontab -l
+```
+
+---
+
+### 실행 결과 확인
+
+콘솔 및 `logs/reservation.log` 또는 `logs/nightly_update.log`에서 결과를 확인하세요. 문제가 있을 경우 로그의 에러 메시지를 기준으로 디버깅합니다.
+
+## 프로그램 구조
 
 ## 프로그램 구조
 
@@ -105,10 +124,12 @@ crontab -e
 │   ├── get_date_id.py            # 날짜 ID 조회 모듈
 │   ├── get_reservation_ids.py    # 예약 가능한 코트 조회 모듈
 │   └── niigata_macro.py          # 예약 실행 모듈
-├── my_data.json              # 사용자 예약 정보
-├── requirements.txt          # 필요한 라이브러리 목록
-├── README.md                 # 사용 설명서
-└── reservation.log           # 실행 로그 (자동 생성)
+├── my_data.json.sample           # 사용자 예약 정보 샘플
+├── start_booking.sh              # 예약 실행 스크립트 (cron 용)
+├── nightly_update.sh             # 자동 업데이트 스크립트 (cron 또는 수동 실행)
+├── requirements.txt              # 필요한 라이브러리 목록
+├── README.md                     # 사용 설명서
+└── reservation.log               # 실행 로그 (자동 생성)
 ```
 
 ## 작동 원리
@@ -199,6 +220,7 @@ crontab -e
 | 2025-07-27 | 3.2.0 | nightly update 기능 추가 |
 | 2025-10-12 | 4.0.0 | api기반 속도 개선 |
 | 2025-10-12 | 4.1.0 | 자동화 툴 제공 (start_booking, nightly_update) |
+| 2025-10-18 | 4.2.0 | 예약 안정성 강화 (1분전 시작, 남은 시간 계산방식으로 변경), 월말시점 월초 예약 대응 |
 
 ## ✅ 라이선스 및 제작자
 
