@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# Activate virtual environment (if needed)
-# source venv/bin/activate
+# Get current path
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Run main.py
-python3 main.py
+# Make logs dir if not exists
+mkdir -p "$SCRIPT_DIR/logs"
 
-# Deactivate virtual environment (if needed)
-# deactivate
+# Execute python3
+/usr/local/bin/python3 "$SCRIPT_DIR/main.py"
+

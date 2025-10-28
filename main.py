@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import json
 import logging
 import time
@@ -14,13 +15,25 @@ from modules.niigata_macro import NiigataReservationMacro
 DAY_AFTER = 7 
 EQUIPMENT = 'バドミントン'
 WEEKDAY_MAP = ['月', '火', '水', '木', '金', '土', '日']
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(BASE_DIR, "logs", "reservation.log")
 
 # Set logging
+# Ensure logs directory exists before configuring FileHandler
+logs_dir = os.path.join(BASE_DIR, "logs")
+if not os.path.exists(logs_dir):
+    try:
+        os.makedirs(logs_dir, exist_ok=True)
+    except Exception as e:
+        # If we can't create logs dir, fallback to console only
+        print(f"[WARN] Could not create logs directory: {e}")
+        LOG_FILE = None
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('reservation.log', encoding='utf-8'),
+        logging.FileHandler(LOG_FILE, encoding='utf-8') if LOG_FILE else logging.NullHandler(),
         logging.StreamHandler()
     ]
 )
@@ -45,7 +58,7 @@ FACILITY_ID_MAP = {
 # Load user data from my_data.json
 def load_user_data(json_file='my_data.json'):
     try:
-        with open(json_file, 'r', encoding='utf-8') as f:
+        with open(os.path.join(BASE_DIR, json_file), 'r', encoding='utf-8') as f:
             data = json.load(f)
         logger.info(f"[INFO] User data loaded: {json_file}")
 
@@ -149,6 +162,33 @@ def make_reservation_with_data(user_data, date_obj, course_time_id, court_name, 
 
 # Main execution function
 def main():
+    # Wait until next 07:00:00 before starting main logic
+    def wait_until(hour=7, minute=0, second=0):
+        now = datetime.now()
+        target = now.replace(hour=hour, minute=minute, second=second, microsecond=0)
+        if now >= target:
+            logger.info("Target time already passed for today. Proceeding without wait.")
+            return True
+        remaining = (target - now).total_seconds()
+        logger.info(f"Waiting until {target.strftime('%Y-%m-%d %H:%M:%S')} (sleep {int(remaining)}s)")
+        try:
+            # Sleep in chunks to allow graceful interrupt
+            while remaining > 0:
+                chunk = min(60, remaining)
+                time.sleep(chunk)
+                remaining -= chunk
+            # final short spin to be precise
+            while datetime.now() < target:
+                time.sleep(0.05)
+            return True
+        except KeyboardInterrupt:
+            logger.info("Waiting interrupted by user.")
+            return False
+
+    should_continue = wait_until(7, 0, 0)
+    if not should_continue:
+        return False
+
     start_time = time.time()
     logger.info(f"### Start reservation ###")
     

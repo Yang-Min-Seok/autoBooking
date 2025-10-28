@@ -20,82 +20,101 @@ Python 3.7以上が必要です。
 pip install -r requirements.txt
 ```
 
-## 使い方
+## 全体の環境構築
 
-### 1. 予約情報の入力
-1) サンプルファイルをコピー
+まずは環境を整えてください。
+
+1) リポジトリのクローンと移動
+
+```bash
+git clone <repo-url> /path/to/autoBooking
+cd /path/to/autoBooking
+```
+
+2) Python 仮想環境と依存関係のインストール
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+3) 設定ファイルの準備
+
 ```bash
 cp my_data.json.sample my_data.json
-```
-2) `my_data.json`ファイルを以下のように編集してください：
-
-```json
-{
-  "NAME": "山田太郎",
-  "PHONE_NUMBER": "09012345678",
-  "E_MAIL": "your-email@gmail.com",
-  "TIME": "15-17",
-  "FACILITY_NAME": "TOYANO",  // HIGASHI, KITA, TOYANO, NISHI, KAMEDA から選択
-  "COURT_NO": "2"              // 予約したいコート数（省略時は1）
-}
+# my_data.json を編集して予約情報を設定してください
 ```
 
-**フィールド説明：**
-- `NAME`: 予約者名
-- `PHONE_NUMBER`: 電話番号（ハイフンなし）
-- `E_MAIL`: メールアドレス
-- `TIME`: 予約時間帯（例："9-11", "13-15", "15-17"）
-- `FACILITY_NAME`: 体育館キーワード（上記参照）
-- `COURT_NO`: 予約したいコート数（省略時は1）
+4) ログディレクトリの確認
 
-### 2. プログラムの実行
-#### (1) 直接実行
 ```bash
-python main.py
+mkdir -p logs
 ```
 
-#### (2) スクリプトで実行（推奨）
-OSに合わせて以下のスクリプトを利用してください：
+## start_booking の実行と予約方法
 
-##### macOS/Linux
+`start_booking.sh` は予約プロセスを起動するスクリプトです。通常 cron から実行します。内部で07:00まで待機するため、少し早めに起動する設定にするのが安全です。
+
+1) 実行権限付与＆手動テスト
+
 ```bash
-# 初回のみ実行権限を付与
-chmod +x start_booking.sh nightly_update.sh
-
-# 実行
+chmod +x start_booking.sh
 sh start_booking.sh
 ```
 
-##### Windows
-```cmd
-start_booking.bat
-```
+2) crontab に登録（例：毎週土曜 06:59 実行）
 
-#### (3) 予約実行（自動化）
-##### macOS: cron 登録例
 ```bash
 crontab -e
-# 毎週土曜午前7時に予約実行
-0 7 * * 6 cd /Users/yourname/autoBooking && sh start_booking.sh
 
-# 毎日午前1時に自動アップデート（mainブランチ最新化）
-0 1 * * * cd /Users/yourname/autoBooking && sh nightly_update.sh
+# 毎週土曜 06:59 に実行 (ログをファイルへリダイレクト)
+59 6 * * 6 cd /Users/<your-username>/Desktop/autoBooking && sh start_booking.sh >> /Users/<your-username>/Desktop/autoBooking/logs/reservation.log 2>&1
 ```
 
-##### Windows: タスクスケジューラ登録
-1. タスクスケジューラを起動 → 「基本タスクの作成」クリック
-2. トリガー：希望の予約時間を設定（例：毎週土曜午前7時）
-3. 操作：プログラム/スクリプトに `start_booking.bat` のパスを指定
-4. 完了後、自動実行されます
+3) crontab 登録の確認
 
-##### Windows: 自動アップデート登録例
-1. タスクスケジューラを起動 → 「基本タスクの作成」クリック
-2. トリガー：毎日午前1時に設定
-3. 操作：プログラム/スクリプトに `nightly_update.bat` のパスを指定
-4. 完了後、自動実行されます
+```bash
+crontab -l
+```
 
-### 3. 実行結果の確認
-コンソールや`reservation.log`ファイルで予約結果を確認できます。
+注意：
+- cron では絶対パスと必要な環境変数（PATH、仮想環境のアクティベートなど）を明示してください。仮想環境を使う場合は `cd` 後に `source venv/bin/activate` を追加するか、スクリプト内でアクティベートすることを推奨します。
+- スクリプトを7時00分前に実行すると `main.py`の内部待機ロジックが正確に7時00分に予約プロセスを始まります。
+
+## nightly_update の実行と登録方法
+
+自動更新用の `nightly_update.sh` は定期実行（例：毎日 01:00）を想定しています。
+
+1) 実行権限付与＆手動テスト
+
+```bash
+chmod +x nightly_update.sh
+sh nightly_update.sh
+```
+
+2) crontab 例（毎日 01:00 実行）
+
+```bash
+crontab -e
+
+# 毎日 01:00 に実行
+0 1 * * * cd /Users/<your-username>/Desktop/autoBooking && sh nightly_update.sh >> /Users/<your-username>/Desktop/autoBooking/logs/nightly_update.log 2>&1
+```
+
+3) 登録確認
+
+```bash
+crontab -l
+```
+
+---
+
+### 実行結果の確認
+
+出力はコンソールおよび `logs/reservation.log` / `logs/nightly_update.log` を参照してください。問題が発生した場合はログの内容を確認して対処してください。
+
+## プログラム構成
 
 ## プログラム構成
 
@@ -105,10 +124,12 @@ crontab -e
 │   ├── get_date_id.py            # 日付ID取得モジュール
 │   ├── get_reservation_ids.py    # 空きコート取得モジュール
 │   └── niigata_macro.py          # 予約実行モジュール
-├── my_data.json              # ユーザー予約情報
-├── requirements.txt          # 必要ライブラリ一覧
-├── README.md                 # 日本語説明書
-└── reservation.log           # 実行ログ（自動生成）
+├── my_data.json.sample           # ユーザー予約情報サンプル
+├── start_booking.sh              # 予約実行スクリプト (cron 用)
+├── nightly_update.sh             # 自動アップデートスクリプト (cron または 手動実行)
+├── requirements.txt              # 必要ライブラリ一覧
+├── README.md                     # 日本語説明書
+└── reservation.log               # 実行ログ（自動生成）
 ```
 
 ## 動作概要
@@ -199,6 +220,7 @@ crontab -e
 | 2025-07-27 | 3.2.0 | nightly update 機能追加 |
 | 2025-10-12 | 4.0.0 | api ベースの速度改善 |
 | 2025-10-12 | 4.1.0 | 自動化ツール提供(start_booking, nightly_update) |
+| 2025-10-18 | 4.2.0 | 予約の安全性強化・月末時点での月初予約対応 |
 
 ## ✅ ライセンスおよび製作者
 

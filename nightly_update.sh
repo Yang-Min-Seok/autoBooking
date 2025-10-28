@@ -1,7 +1,11 @@
 #!/bin/bash
 
 # Log file path
-LOG_FILE="$(dirname "$0")/nightly_update.log"
+LOG_DIR="$(dirname "$0")/logs"
+LOG_FILE="$LOG_DIR/nightly_update.log"
+
+# Ensure logs directory exists
+mkdir -p "$LOG_DIR"
 
 cd "$(dirname "$0")"
 
