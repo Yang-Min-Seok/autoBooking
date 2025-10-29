@@ -7,5 +7,5 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$SCRIPT_DIR/logs"
 
 # Execute python3
-/usr/local/bin/python3 "$SCRIPT_DIR/main.py"
+python3 "$SCRIPT_DIR/main.py"
 
