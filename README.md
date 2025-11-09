@@ -39,12 +39,22 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3) 설정 파일 복사
+3) 설정 파일 생성 (브라우저 사용)
+
+1) 프로젝트 루트에 있는 `USEME.html` 파일을 웹 브라우저로 엽니다 (파일 더블클릭 또는 브라우저에서 열기).
+
+2) 폼을 작성한 뒤 "설정 저장" 버튼을 누르면 브라우저의 다운로드 폴더(예: `~/Downloads`)에 `my_data.json` 파일이 생성됩니다.
+
+3) 생성된 `my_data.json` 파일을 프로젝트 폴더로 이동합니다. 예:
 
 ```bash
-cp my_data.json.sample my_data.json
-# my_data.json을 편집하여 예약자 정보, 시간, 시설 등을 설정하세요.
+# macOS / Linux 예시 (경로는 실제 사용자 환경에 맞게 수정하세요)
+mv ~/Downloads/my_data.json /path/to/autoBooking/my_data.json
+# 또는 복사
+cp ~/Downloads/my_data.json /path/to/autoBooking/my_data.json
 ```
+
+참고: `USEME.html`을 열면 브라우저에서 직접 설정 파일을 만들 수 있으므로 별도의 샘플 복사 과정이 필요하지 않습니다.
 
 4) 로그 디렉터리 확인
 
@@ -116,15 +126,13 @@ crontab -l
 
 ## 프로그램 구조
 
-## 프로그램 구조
-
 ```
 ├── main.py                    # 메인 실행 파일
 ├── modules/
 │   ├── get_date_id.py            # 날짜 ID 조회 모듈
 │   ├── get_reservation_ids.py    # 예약 가능한 코트 조회 모듈
 │   └── niigata_macro.py          # 예약 실행 모듈
-├── my_data.json.sample           # 사용자 예약 정보 샘플
+├── USEME.html                    # 브라우저에서 my_data.json을 생성하는 폼
 ├── start_booking.sh              # 예약 실행 스크립트 (cron 용)
 ├── nightly_update.sh             # 자동 업데이트 스크립트 (cron 또는 수동 실행)
 ├── requirements.txt              # 필요한 라이브러리 목록
@@ -221,6 +229,7 @@ crontab -l
 | 2025-10-12 | 4.0.0 | api기반 속도 개선 |
 | 2025-10-12 | 4.1.0 | 자동화 툴 제공 (start_booking, nightly_update) |
 | 2025-10-18 | 4.2.0 | 예약 안정성 강화 (1분전 시작, 남은 시간 계산방식으로 변경), 월말시점 월초 예약 대응 |
+| 2025-11-09 | 4.3.0 | json파일 생성 브라우저 제공 |
 
 ## ✅ 라이선스 및 제작자
 
