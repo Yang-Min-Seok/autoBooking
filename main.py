@@ -12,7 +12,7 @@ from modules.get_reservation_ids import get_reservation_ids_by_time_slot
 from modules.niigata_macro import NiigataReservationMacro
 
 # Define constants
-DAY_AFTER = 7 
+DAY_AFTER = 7
 EQUIPMENT = 'バドミントン'
 WEEKDAY_MAP = ['月', '火', '水', '木', '金', '土', '日']
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

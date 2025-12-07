@@ -4,6 +4,9 @@
 import requests
 from bs4 import BeautifulSoup
 import logging
+import time
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 
 # Define constants
 BASE_URL = "https://niigata-kaikou.jp"
@@ -19,6 +22,29 @@ HEADERS = {
     'Upgrade-Insecure-Requests': '1'
 }
 
+def _parse_retry_after(header_value):
+    """Parse Retry-After header. Returns seconds to wait (float).
+    Supports numeric seconds or HTTP-date. Returns None if cannot parse.
+    """
+    if not header_value:
+        return None
+    # try numeric value
+    try:
+        return float(header_value)
+    except Exception:
+        pass
+
+    # try HTTP-date
+    try:
+        dt = parsedate_to_datetime(header_value)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        now = datetime.now(timezone.utc)
+        diff = (dt - now).total_seconds()
+        return max(0.0, diff)
+    except Exception:
+        return None
+
 logger = logging.getLogger(__name__)
 
 class NiigataReservationMacro:
@@ -28,12 +54,16 @@ class NiigataReservationMacro:
         self.session = requests.Session()
         self.session.headers.update(HEADERS)
         self.csrf_token = None
+        # store Retry-After from last CSRF GET if provided
+        self.last_csrf_retry_after = None
     
     def get_csrf_token(self, course_time_id):
         """Obtain CSRF token"""
         try:
             url = f"{BASE_URL}/schedule/reserve/{course_time_id}"
             response = self.session.get(url)
+            # capture Retry-After header from GET (may be useful for polling)
+            self.last_csrf_retry_after = response.headers.get('Retry-After')
             response.raise_for_status()
             
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -84,6 +114,34 @@ class NiigataReservationMacro:
             )
             
             logger.info(f"confirm request response: {response.status_code}")
+
+            # on 429, wait Retry-After (or fallback) then re-fetch CSRF token once and retry exactly one time
+            if response.status_code == 429:
+                logger.warning("confirm request returned 429 - will wait Retry-After and retry once")
+
+                post_retry = _parse_retry_after(response.headers.get('Retry-After'))
+                wait = post_retry if post_retry is not None else 1.0
+                logger.info(f"Waiting {wait}s before retrying (from Retry-After or default)")
+                time.sleep(wait)
+
+                # re-obtain CSRF token once (if possible) and update data
+                if course_time_id:
+                    if self.get_csrf_token(course_time_id):
+                        reservation_data['_token'] = self.csrf_token
+                        logger.info(f"Polled CSRF token: {self.csrf_token}")
+                    else:
+                        logger.warning("Failed to refresh CSRF token before retry")
+
+                # single retry
+                response = self.session.post(
+                    post_url,
+                    data=reservation_data,
+                    headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                )
+                logger.info(f"confirm retry response: {response.status_code}")
+                if response.status_code == 429:
+                    logger.error("confirm retry returned 429 again - giving up")
+                    return False
             
             if response.status_code == 200:
                 # If it is the reservation information input page, immediately send in send mode
@@ -137,6 +195,35 @@ class NiigataReservationMacro:
             )
             
             logger.info(f"Reservation request response: {response.status_code}")
+
+            # on 429, wait Retry-After (or fallback) then re-fetch CSRF token once and retry exactly one time
+            if response.status_code == 429:
+                logger.warning("Reservation request returned 429 - will wait Retry-After and retry once")
+
+                post_retry = _parse_retry_after(response.headers.get('Retry-After'))
+                wait = post_retry if post_retry is not None else 1.0
+                logger.info(f"Waiting {wait}s before retrying (from Retry-After or default)")
+                time.sleep(wait)
+
+                # re-obtain CSRF token once (if possible) and update data
+                course_time_id = form_data.get('course_time_id')
+                if course_time_id:
+                    if self.get_csrf_token(course_time_id):
+                        form_data['_token'] = self.csrf_token
+                        logger.info(f"Polled CSRF token: {self.csrf_token}")
+                    else:
+                        logger.warning("Failed to refresh CSRF token before retry")
+
+                # single retry
+                response = self.session.post(
+                    post_url,
+                    data=form_data,
+                    headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                )
+                logger.info(f"Reservation retry response: {response.status_code}")
+                if response.status_code == 429:
+                    logger.error("Reservation retry returned 429 again - giving up")
+                    return False
             
             if response.status_code == 302:
                 # Redirect response (reservation successful)
