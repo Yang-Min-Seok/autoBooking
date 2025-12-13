@@ -15,10 +15,22 @@
 ### 1. Pythonのインストール
 Python 3.7以上が必要です。
 
-### 2. 必要なライブラリのインストール
+### 2. 必要なライブラリのインストール (仮想環境推奨)
+プロジェクトごとの依存分離のため、`venv` 仮想環境を作成してその中にライブラリをインストールすることを推奨します。
+
 ```bash
+# macOS / Linux
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Windows (PowerShell)
+python -m venv venv
+venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
+
+補足: システム全体の Python に直接インストールする代わりに仮想環境を使用してください。`start_booking.sh` と `start_booking.bat` はデフォルトで `./venv` 内の Python を使用し、必要であれば環境変数 `VENV_PYTHON` でパスを指定できます。
 
 ## 全体の環境構築
 
@@ -78,8 +90,10 @@ sh start_booking.sh
 ```bash
 crontab -e
 
-# 毎週土曜 06:59 に実行 (ログをファイルへリダイレクト)
-59 6 * * 6 cd /Users/<your-username>/Desktop/autoBooking && sh start_booking.sh >> /Users/<your-username>/Desktop/autoBooking/logs/reservation.log 2>&1
+# 毎週土曜 06:59 に実行
+# 注意: `main.py` が `logs/reservation.log` を自動的に作成・出力します。
+# そのため crontab での追加ログリダイレクトは基本的に不要です。
+59 6 * * 6 cd /Users/<your-username>/Desktop/autoBooking && sh start_booking.sh
 ```
 
 3) crontab 登録の確認
@@ -108,8 +122,10 @@ sh nightly_update.sh
 ```bash
 crontab -e
 
-# 毎日 01:00 に実行
-0 1 * * * cd /Users/<your-username>/Desktop/autoBooking && sh nightly_update.sh >> /Users/<your-username>/Desktop/autoBooking/logs/nightly_update.log 2>&1
+# 毎日 01:00 に実行: ディレクトリ移動後にスクリプトを実行
+# `nightly_update.sh` の標準出力をファイルに残したい場合はリダイレクトできますが、
+# 予約関連ログは `main.py` が担当しているため通常は不要です。
+0 1 * * * cd /Users/<your-username>/Desktop/autoBooking && sh nightly_update.sh
 ```
 
 3) 登録確認
