@@ -15,10 +15,22 @@
 ### 1. Python 설치
 Python 3.7 이상이 필요합니다.
 
-### 2. 필요한 라이브러리 설치
+### 2. 필요한 라이브러리 설치 (가상환경 권장)
+권장: 프로젝트별 격리를 위해 `venv` 가상환경을 만들고 그 안에 라이브러리를 설치하세요.
+
 ```bash
+# macOS / Linux
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Windows (PowerShell)
+python -m venv venv
+venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
+
+참고: 시스템(글로벌) 파이썬에 직접 설치하는 대신 가상환경을 사용하는 것을 권장합니다. `start_booking.sh`와 `start_booking.bat`는 기본적으로 `./venv` 내부의 파이썬을 사용하려 시도하며, 필요하면 환경변수 `VENV_PYTHON`으로 경로를 지정할 수 있습니다.
 
 ## 전체 환경 구축
 
@@ -78,8 +90,10 @@ sh start_booking.sh
 ```bash
 crontab -e
 
-# 매주 토요일 06:59에 실행 (로그 리다이렉트)
-59 6 * * 6 cd /Users/<your-username>/Desktop/autoBooking && sh start_booking.sh >> /Users/<your-username>/Desktop/autoBooking/logs/reservation.log 2>&1
+# 매주 토요일 06:59에 실행
+# 주의: `main.py`는 자체적으로 `logs/reservation.log`에 로그를 남깁니다.
+# 따라서 crontab에서 별도 로그 리다이렉션을 하지 않아도 됩니다.
+59 6 * * 6 cd /Users/<your-username>/Desktop/autoBooking && sh start_booking.sh
 ```
 
 3) 등록 확인
@@ -109,7 +123,9 @@ sh nightly_update.sh
 crontab -e
 
 # 매일 01:00에 실행: 디렉터리 이동 후 스크립트 실행
-0 1 * * * cd /Users/<your-username>/Desktop/autoBooking && sh nightly_update.sh >> /Users/<your-username>/Desktop/autoBooking/logs/nightly_update.log 2>&1
+# `nightly_update.sh` 출력이 필요하면 파일로 리다이렉트하시되,
+# 예약 로그는 `main.py`가 담당하므로 기본적으로는 리다이렉트 불필요합니다.
+0 1 * * * cd /Users/<your-username>/Desktop/autoBooking && sh nightly_update.sh
 ```
 
 3) 등록 확인

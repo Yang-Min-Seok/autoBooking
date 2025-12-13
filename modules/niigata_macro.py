@@ -118,16 +118,17 @@ class NiigataReservationMacro:
             # on 429, wait Retry-After (or fallback) then re-fetch CSRF token once and retry exactly one time
             if response.status_code == 429:
                 logger.warning("confirm request returned 429 - will wait Retry-After and retry once")
-
                 post_retry = _parse_retry_after(response.headers.get('Retry-After'))
                 wait = post_retry if post_retry is not None else 1.0
                 logger.info(f"Waiting {wait}s before retrying (from Retry-After or default)")
                 time.sleep(wait)
 
                 # re-obtain CSRF token once (if possible) and update data
+                token_refreshed = False
                 if course_time_id:
                     if self.get_csrf_token(course_time_id):
                         reservation_data['_token'] = self.csrf_token
+                        token_refreshed = True
                         logger.info(f"Polled CSRF token: {self.csrf_token}")
                     else:
                         logger.warning("Failed to refresh CSRF token before retry")
@@ -139,6 +140,8 @@ class NiigataReservationMacro:
                     headers={'Content-Type': 'application/x-www-form-urlencoded'}
                 )
                 logger.info(f"confirm retry response: {response.status_code}")
+                if response.status_code == 200 and token_refreshed:
+                    logger.info("confirm retry returned 200 after CSRF token refresh")
                 if response.status_code == 429:
                     logger.error("confirm retry returned 429 again - giving up")
                     return False
@@ -199,17 +202,18 @@ class NiigataReservationMacro:
             # on 429, wait Retry-After (or fallback) then re-fetch CSRF token once and retry exactly one time
             if response.status_code == 429:
                 logger.warning("Reservation request returned 429 - will wait Retry-After and retry once")
-
                 post_retry = _parse_retry_after(response.headers.get('Retry-After'))
                 wait = post_retry if post_retry is not None else 1.0
                 logger.info(f"Waiting {wait}s before retrying (from Retry-After or default)")
                 time.sleep(wait)
 
                 # re-obtain CSRF token once (if possible) and update data
+                token_refreshed = False
                 course_time_id = form_data.get('course_time_id')
                 if course_time_id:
                     if self.get_csrf_token(course_time_id):
                         form_data['_token'] = self.csrf_token
+                        token_refreshed = True
                         logger.info(f"Polled CSRF token: {self.csrf_token}")
                     else:
                         logger.warning("Failed to refresh CSRF token before retry")
@@ -221,6 +225,8 @@ class NiigataReservationMacro:
                     headers={'Content-Type': 'application/x-www-form-urlencoded'}
                 )
                 logger.info(f"Reservation retry response: {response.status_code}")
+                if response.status_code == 200 and token_refreshed:
+                    logger.info("reservation retry returned 200 after CSRF token refresh")
                 if response.status_code == 429:
                     logger.error("Reservation retry returned 429 again - giving up")
                     return False
