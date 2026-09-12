@@ -127,9 +127,9 @@ def find_available_reservation(date_id, target_time_slot):
         return None, None
 
 # Execute reservation with user data
-def make_reservation_with_data(user_data, date_obj, course_time_id, court_name, course_name):
+def make_reservation_with_data(user_data, date_obj, course_time_id, court_name, course_name, macro=None):
     try:
-        macro = NiigataReservationMacro()
+        macro = macro or NiigataReservationMacro()
         
         # Transform date to required format
         weekday = WEEKDAY_MAP[date_obj.weekday()]
@@ -205,16 +205,21 @@ def main():
             logger.error("[ERROR] Invalid date/time/facility information.")
             return False
 
+        macro = NiigataReservationMacro()
+
         # 3. Get date ID
         logger.info(f"[INFO] Searching booking id for {day}...")
-        date_id = get_badminton_date_id(day, facility_id)
+        date_id = get_badminton_date_id(day, facility_id, session=macro.session)
         if not date_id:
             logger.error(f"[ERROR] Can't find booking id for {day}...")
             return False
 
         # 4. Find available reservation
         logger.info(f"[INFO] Checking available courts: {time_slot}...")
-        time_slot_data = get_reservation_ids_by_time_slot(f"https://niigata-kaikou.jp/schedule/course/{date_id}/1")
+        time_slot_data = get_reservation_ids_by_time_slot(
+            f"https://niigata-kaikou.jp/schedule/course/{date_id}/1",
+            session=macro.session
+        )
         available_courts = time_slot_data.get(time_slot, [])
         if not available_courts:
             logger.error(f"[ERROR] Can't find available courts for '{time_slot}'...")
@@ -230,11 +235,14 @@ def main():
             # Use course_time_id as course_name
             course_name = course_time_id
             logger.info(f"[INFO] Making reservation for court: {court_name} (ID: {course_time_id})...")
-            success, reserved_court = make_reservation_with_data(user_data, date_obj, course_time_id, court_name, course_name)
+            success, reserved_court = make_reservation_with_data(user_data, date_obj, course_time_id, court_name, course_name, macro=macro)
             if success:
                 reserved_count += 1
                 reserved_courts.append(court_name)
                 logger.info(f"Reservation completed - court: {court_name}")
+            elif success is None:
+                logger.error("Reservation result is indeterminate; stopping to avoid duplicate bookings.")
+                break
             else:
                 logger.error(f"Reservation failed for court: {court_name}")
 
