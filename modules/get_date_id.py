@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import requests
+from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup
 import re
+import time
 
 # Define constants
 BASE_URL = "https://niigata-kaikou.jp"
@@ -30,14 +32,20 @@ Args:
 Returns:
     str: The date ID (e.g., "13118") or None
 """
-def get_badminton_date_id(target_day, facility_id):
+def get_badminton_date_id(target_day, facility_id, session=None):
 
     try:
-        session = requests.Session()
-        session.headers.update(HEADERS)
+        if session is None:
+            session = requests.Session()
+            session.headers.update(HEADERS)
+            adapter = HTTPAdapter(pool_connections=10, pool_maxsize=10)
+            session.mount('http://', adapter)
+            session.mount('https://', adapter)
         
         url = f"{BASE_URL}/facility/{facility_id}/schedule"
-        response = session.get(url)
+        request_started = time.perf_counter()
+        response = session.get(url, timeout=(5, 10))
+        print(f"Schedule request completed in {time.perf_counter() - request_started:.3f}s")
         response.raise_for_status()
         
         soup = BeautifulSoup(response.text, 'html.parser')

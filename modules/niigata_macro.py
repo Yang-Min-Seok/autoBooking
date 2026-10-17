@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
+from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup
 import logging
 import time
@@ -50,18 +51,29 @@ logger = logging.getLogger(__name__)
 class NiigataReservationMacro:
     """Niigata City Sports Facility Auto Reservation Macro"""
     
-    def __init__(self):
-        self.session = requests.Session()
+    def __init__(self, session=None):
+        self.session = session or requests.Session()
         self.session.headers.update(HEADERS)
+        adapter = HTTPAdapter(pool_connections=20, pool_maxsize=20)
+        self.session.mount('http://', adapter)
+        self.session.mount('https://', adapter)
         self.csrf_token = None
+        self._csrf_cache = {}
         # store Retry-After from last CSRF GET if provided
         self.last_csrf_retry_after = None
     
-    def get_csrf_token(self, course_time_id):
-        """Obtain CSRF token"""
+    def get_csrf_token(self, course_time_id, refresh=False):
+        """Obtain CSRF token for a given course time. Reuse cached token unless refresh requested."""
         try:
+            if not refresh and course_time_id in self._csrf_cache and self._csrf_cache[course_time_id]:
+                self.csrf_token = self._csrf_cache[course_time_id]
+                logger.info(f"Using cached CSRF token for {course_time_id}")
+                return True
+
             url = f"{BASE_URL}/schedule/reserve/{course_time_id}"
-            response = self.session.get(url)
+            request_started = time.perf_counter()
+            response = self.session.get(url, timeout=(5, 10))
+            logger.info(f"CSRF GET completed in {time.perf_counter() - request_started:.3f}s")
             # capture Retry-After header from GET (may be useful for polling)
             self.last_csrf_retry_after = response.headers.get('Retry-After')
             response.raise_for_status()
@@ -71,7 +83,8 @@ class NiigataReservationMacro:
             
             if csrf_input and csrf_input.get('value'):
                 self.csrf_token = csrf_input['value']
-                logger.info(f"CSRF token obtained: {self.csrf_token[:20]}...")
+                self._csrf_cache[course_time_id] = self.csrf_token
+                logger.info("CSRF token obtained")
                 return True
             else:
                 logger.error("CSRF token not found.")
@@ -107,13 +120,14 @@ class NiigataReservationMacro:
             }
             
             post_url = f"{BASE_URL}/schedule/post?"
+            request_started = time.perf_counter()
             response = self.session.post(
                 post_url,
                 data=reservation_data,
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                timeout=(5, 15)
             )
-            
-            logger.info(f"confirm request response: {response.status_code}")
+            logger.info(f"confirm POST completed in {time.perf_counter() - request_started:.3f}s (HTTP {response.status_code})")
 
             # on 429, wait Retry-After (or fallback) then re-fetch CSRF token once and retry exactly one time
             if response.status_code == 429:
@@ -126,20 +140,22 @@ class NiigataReservationMacro:
                 # re-obtain CSRF token once (if possible) and update data
                 token_refreshed = False
                 if course_time_id:
-                    if self.get_csrf_token(course_time_id):
+                    if self.get_csrf_token(course_time_id, refresh=True):
                         reservation_data['_token'] = self.csrf_token
                         token_refreshed = True
-                        logger.info(f"Polled CSRF token: {self.csrf_token}")
+                        logger.info("CSRF token refreshed")
                     else:
                         logger.warning("Failed to refresh CSRF token before retry")
 
                 # single retry
+                request_started = time.perf_counter()
                 response = self.session.post(
                     post_url,
                     data=reservation_data,
-                    headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                    headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                    timeout=(5, 15)
                 )
-                logger.info(f"confirm retry response: {response.status_code}")
+                logger.info(f"confirm retry completed in {time.perf_counter() - request_started:.3f}s (HTTP {response.status_code})")
                 if response.status_code == 200 and token_refreshed:
                     logger.info("confirm retry returned 200 after CSRF token refresh")
                 if response.status_code == 429:
@@ -191,13 +207,15 @@ class NiigataReservationMacro:
             
             # Execute reservation with POST request
             post_url = f"{BASE_URL}/schedule/post?"
+            request_started = time.perf_counter()
             response = self.session.post(
                 post_url,
                 data=form_data,
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                timeout=(5, 15),
+                allow_redirects=False
             )
-            
-            logger.info(f"Reservation request response: {response.status_code}")
+            logger.info(f"send POST completed in {time.perf_counter() - request_started:.3f}s (HTTP {response.status_code})")
 
             # on 429, wait Retry-After (or fallback) then re-fetch CSRF token once and retry exactly one time
             if response.status_code == 429:
@@ -211,20 +229,23 @@ class NiigataReservationMacro:
                 token_refreshed = False
                 course_time_id = form_data.get('course_time_id')
                 if course_time_id:
-                    if self.get_csrf_token(course_time_id):
+                    if self.get_csrf_token(course_time_id, refresh=True):
                         form_data['_token'] = self.csrf_token
                         token_refreshed = True
-                        logger.info(f"Polled CSRF token: {self.csrf_token}")
+                        logger.info("CSRF token refreshed")
                     else:
                         logger.warning("Failed to refresh CSRF token before retry")
 
                 # single retry
+                request_started = time.perf_counter()
                 response = self.session.post(
                     post_url,
                     data=form_data,
-                    headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                    headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                    timeout=(5, 15),
+                    allow_redirects=False
                 )
-                logger.info(f"Reservation retry response: {response.status_code}")
+                logger.info(f"send retry completed in {time.perf_counter() - request_started:.3f}s (HTTP {response.status_code})")
                 if response.status_code == 200 and token_refreshed:
                     logger.info("reservation retry returned 200 after CSRF token refresh")
                 if response.status_code == 429:
@@ -240,7 +261,7 @@ class NiigataReservationMacro:
                     return True
                 else:
                     logger.warning(f"Unexpected redirect: {location}")
-                    return True
+                    return None
             elif response.status_code == 200:
                 # Check response content
                 response_text = response.text
@@ -252,11 +273,14 @@ class NiigataReservationMacro:
                     return False
                 else:
                     logger.warning("Unable to confirm reservation result.")
-                    return True
+                    return None
             else:
                 logger.error(f"Reservation request failed: {response.status_code}")
                 return False
                 
+        except requests.RequestException as e:
+            logger.error(f"Reservation send outcome is indeterminate: {e}")
+            return None
         except Exception as e:
             logger.error(f"Reservation execution failed: {e}")
             return False

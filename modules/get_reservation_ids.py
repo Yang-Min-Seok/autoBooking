@@ -1,7 +1,9 @@
 import requests
+from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup
 import re
 import json
+import time
 from typing import List, Dict, Tuple
 
 # define constants
@@ -38,9 +40,16 @@ def _extract_reservation_ids(soup):
     return time_slot_data
 
 # Get reservation IDs by time slot
-def get_reservation_ids_by_time_slot(url: str) -> Dict[str, List[Tuple[str, str]]]:
+def get_reservation_ids_by_time_slot(url: str, session=None) -> Dict[str, List[Tuple[str, str]]]:
     try:
-        response = requests.get(url)
+        if session is None:
+            session = requests.Session()
+            adapter = HTTPAdapter(pool_connections=10, pool_maxsize=10)
+            session.mount('http://', adapter)
+            session.mount('https://', adapter)
+        request_started = time.perf_counter()
+        response = session.get(url, timeout=(5, 10))
+        print(f"Court-list request completed in {time.perf_counter() - request_started:.3f}s")
         response.raise_for_status()
         
         soup = BeautifulSoup(response.content, 'html.parser')
