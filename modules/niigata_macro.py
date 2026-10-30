@@ -58,16 +58,14 @@ class NiigataReservationMacro:
         self.session.mount('http://', adapter)
         self.session.mount('https://', adapter)
         self.csrf_token = None
-        self._csrf_cache = {}
         # store Retry-After from last CSRF GET if provided
         self.last_csrf_retry_after = None
     
     def get_csrf_token(self, course_time_id, refresh=False):
-        """Obtain CSRF token for a given course time. Reuse cached token unless refresh requested."""
+        """Obtain a session CSRF token, reusing it unless refresh is requested."""
         try:
-            if not refresh and course_time_id in self._csrf_cache and self._csrf_cache[course_time_id]:
-                self.csrf_token = self._csrf_cache[course_time_id]
-                logger.info(f"Using cached CSRF token for {course_time_id}")
+            if not refresh and self.csrf_token:
+                logger.info(f"Reusing session CSRF token for {course_time_id}")
                 return True
 
             url = f"{BASE_URL}/schedule/reserve/{course_time_id}"
@@ -83,7 +81,6 @@ class NiigataReservationMacro:
             
             if csrf_input and csrf_input.get('value'):
                 self.csrf_token = csrf_input['value']
-                self._csrf_cache[course_time_id] = self.csrf_token
                 logger.info("CSRF token obtained")
                 return True
             else:
