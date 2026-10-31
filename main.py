@@ -185,28 +185,31 @@ def main():
             logger.info("Waiting interrupted by user.")
             return False
 
-    should_continue = wait_until(7, 0, 0)
-    if not should_continue:
-        return False
-
-    start_time = time.time()
-    logger.info(f"### Start reservation ###")
-    
     try:
-        # 1. Load user data
+        # Prepare local state before the release time so the first request can start promptly.
         user_data = load_user_data()
         if not user_data:
             logger.error("[ERROR] Failed to load user data.")
             return False
 
-        # 2. Parse date and time information
         day, time_slot, date_obj, facility_name, facility_id = parse_date_and_time(user_data)
         if not all([day, time_slot, date_obj, facility_name, facility_id]):
             logger.error("[ERROR] Invalid date/time/facility information.")
             return False
 
         macro = NiigataReservationMacro()
+    except Exception as e:
+        logger.error(f"[ERROR] Reservation preparation failed: {e}")
+        return False
 
+    should_continue = wait_until(7, 0, 0)
+    if not should_continue:
+        return False
+
+    start_time = time.time()
+    logger.info("### Start reservation ###")
+
+    try:
         # 3. Get date ID
         logger.info(f"[INFO] Searching booking id for {day}...")
         date_id = get_badminton_date_id(day, facility_id, session=macro.session)
