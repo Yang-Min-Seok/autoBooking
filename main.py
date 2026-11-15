@@ -202,6 +202,12 @@ def main():
         logger.error(f"[ERROR] Reservation preparation failed: {e}")
         return False
 
+    # Resolve the stable date ID before release time; availability is checked fresh below.
+    logger.info(f"[INFO] Preloading booking id for {day} before reservation time...")
+    date_id = get_badminton_date_id(day, facility_id, session=macro.session)
+    if not date_id:
+        logger.warning("[WARN] Could not preload booking id; will retry after reservation time.")
+
     should_continue = wait_until(7, 0, 0)
     if not should_continue:
         return False
@@ -210,14 +216,15 @@ def main():
     logger.info("### Start reservation ###")
 
     try:
-        # 3. Get date ID
-        logger.info(f"[INFO] Searching booking id for {day}...")
-        date_id = get_badminton_date_id(day, facility_id, session=macro.session)
+        # Retry after release if the preflight lookup was unavailable.
+        if not date_id:
+            logger.info(f"[INFO] Searching booking id for {day}...")
+            date_id = get_badminton_date_id(day, facility_id, session=macro.session)
         if not date_id:
             logger.error(f"[ERROR] Can't find booking id for {day}...")
             return False
 
-        # 4. Find available reservation
+        # Always fetch current availability after the release time.
         logger.info(f"[INFO] Checking available courts: {time_slot}...")
         time_slot_data = get_reservation_ids_by_time_slot(
             f"https://niigata-kaikou.jp/schedule/course/{date_id}/1",
